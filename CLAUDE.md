@@ -66,3 +66,6 @@ All architecture and design documentation has been created:
 3. Set up base project with mypyc build system
 4. Deploy Plane and Temporal infrastructure
 5. Implement first agent (Feature Estimator)
+
+## Repository Conventions
+- Changes to the planning docs under folder planning/ should be considered enhancements not docs changes, as the docs themselves are the artifact of that component.
