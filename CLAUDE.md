@@ -1,28 +1,52 @@
 # Vibe Dev Team - Project Memory
 
 ## Project Overview
-This is a documentation-focused monorepo for AI agent team development planning and coordination.
+AI-powered software development team using specialized agents communicating through a ticket tracking system (Plane).
+
+## Architecture Decisions
+- **Agent Framework**: CrewAI (role-based agents) or minimal custom framework
+- **Workflow Orchestration**: Temporal for durable, long-running workflows
+- **Ticket System**: Plane (self-hosted, API-first, webhook support)
+- **Language**: Python 3.11+ with mypyc compilation for type safety
+- **LLM Abstraction**: LiteLLM for multi-provider support
+- **Web Framework**: FastAPI for webhook handling
+
+## Type Safety Strategy
+- **mypyc-first**: Compile everything except dynamic LLM wrappers
+- **Static Analysis**: mypy + pyright with maximum strictness
+- **CI Enforcement**: Type errors = build failures
+- **Zero Runtime Overhead**: All checking happens at compile/CI time
+
+## Agent Roles (Hyper-Specialized)
+- Feature Complexity Estimator
+- Requirements Decomposer
+- Architecture Decision Maker
+- Code Style Enforcer
+- Security Auditor
+- Test Case Generator
+- Tester & QA Manager
+- Documentation Manager
+- Merge Conflict Resolver
+
+## Development Tools
+- **Git**: GitHub (abstracted for GitLab compatibility)
+- **CI/CD**: GitHub Actions (abstracted for other providers)
+- **Code Intelligence**: ast-grep, semgrep, ctags
+- **Refactoring**: rope, comby, grit
+- **Linting**: ruff, eslint, prettier
 
 ## Repository Structure
-- **planning/**: Documentation package for AI agent team roles and interaction patterns
-- Uses release-please for automated versioning and releases
-
-## Release Management
-- **Tool**: release-please with GitHub Actions workflow
-- **Configuration**: 
-  - `planning` package uses "simple" release type (for documentation)
-  - Separate pull requests enabled for independent versioning
-  - Node workspace plugin for monorepo support
-- **Target branch**: master
-- **Authentication**: GitHub App with custom tokens
+- **planning/**: Documentation and architecture decisions
+- **src/compiled/**: Type-checked, mypyc-compiled code
+- **src/dynamic/**: Dynamic code that can't be compiled
 
 ## Git Workflow
 - **Main branch**: master (for releases)
 - **Current work**: planning branch
-- Follows conventional commits for automated changelog generation
-- Commit to git as you work. Commits should be small and frequent, covering only a single logical task.
+- Follows conventional commits
+- Small, frequent commits covering single logical tasks
 
-## Key Files
-- `release-please-config.json`: Release configuration
-- `.release-please-manifest.json`: Version tracking
-- `.github/workflows/release-please.yml`: Automated release workflow
+## Next Steps
+- Create system architecture diagram
+- Define API contracts between components
+- Begin implementation of base agent framework
