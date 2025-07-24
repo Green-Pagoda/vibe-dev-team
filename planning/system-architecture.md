@@ -28,6 +28,9 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
                                     │
         ┌───────────────────────────┴───────────────────────────┐
         │                   Agent Workers                        │
+        ├──────────────────────────────────────────────────────┤
+        │             CrewAI Agent Framework                    │
+        │          (Role-based Agent Execution)                │
         ├────────────┬────────────┬────────────┬────────────────┤
         │  Feature   │Requirements│   Code     │    Test        │
         │ Estimator  │Decomposer  │ Generator  │  Runner        │
@@ -61,6 +64,24 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 - **Communication**: Only through Plane API (no direct agent-to-agent)
 - **State**: Stateless - all context from tickets
 
+#### CrewAI Agent Framework
+- **Purpose**: Provides role-based agent execution foundation
+- **Responsibilities**:
+  - Define agent roles with specific capabilities and tools
+  - Handle LLM interactions through standardized interfaces
+  - Execute agent tasks with consistent error handling
+  - Provide memory and context management per agent
+- **Integration**: 
+  - Receives tasks from Temporal workflows
+  - Uses Plane API client for ticket operations
+  - Leverages LiteLLM for provider-agnostic LLM access
+  - Executes development tools through CLI interface
+- **Agent Configuration**: Each specialized agent (Feature Estimator, etc.) is implemented as a CrewAI agent with:
+  - Custom system prompts for their specific role
+  - Tailored tool sets for their domain
+  - Optimized LLM model selection via LiteLLM
+  - Role-specific memory and context handling
+
 ### 4. External Integrations
 
 #### Plane API Client
@@ -93,26 +114,26 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
    │
 3. Temporal starts TicketWorkflow
    │
-4. Feature Estimator Agent
+4. CrewAI Feature Estimator Agent
    ├─→ Reads ticket via Plane API
-   ├─→ Analyzes complexity
-   └─→ Updates ticket with estimate
+   ├─→ Analyzes complexity using specialized tools
+   └─→ Updates ticket with structured estimate
    │
-5. Requirements Decomposer Agent  
+5. CrewAI Requirements Decomposer Agent  
    ├─→ Reads estimated ticket
-   ├─→ Creates subtask tickets
-   └─→ Links subtasks to parent
+   ├─→ Creates subtask tickets with clear acceptance criteria
+   └─→ Links subtasks to parent via Plane API
    │
-6. For each subtask:
-   ├─→ Code Generator Agent
-   ├─→ Style Enforcer Agent
-   ├─→ Security Auditor Agent
-   ├─→ Test Generator Agent
-   └─→ QA Manager Agent (gate)
+6. For each subtask (CrewAI agents execute in parallel):
+   ├─→ Code Generator Agent (writes implementation)
+   ├─→ Style Enforcer Agent (applies formatting/conventions)
+   ├─→ Security Auditor Agent (scans for vulnerabilities)
+   ├─→ Test Generator Agent (creates comprehensive tests)
+   └─→ QA Manager Agent (validates all work - quality gate)
    │
-7. Documentation Manager Agent
-   ├─→ Generates docs from code
-   └─→ Creates final PR
+7. CrewAI Documentation Manager Agent
+   ├─→ Generates docs from code artifacts
+   └─→ Creates final PR with all changes
 ```
 
 ## Deployment Architecture
