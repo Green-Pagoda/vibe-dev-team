@@ -20,6 +20,7 @@ This is a documentation-focused monorepo for AI agent team development planning 
 - **Main branch**: master (for releases)
 - **Current work**: planning branch
 - Follows conventional commits for automated changelog generation
+- Commit to git as you work. Commits should be small and frequent, covering only a single logical task.
 
 ## Key Files
 - `release-please-config.json`: Release configuration
