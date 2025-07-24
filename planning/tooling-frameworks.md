@@ -43,17 +43,33 @@
 
 ## Framework Architecture
 
-### Agent Framework
-**LangChain** (Primary Choice)
-- Mature agent abstractions
-- Multi-provider support built-in
-- Tool use patterns established
-- Memory management systems
+### Agent Framework Options
 
-**Alternative: Custom Framework**
-- Direct provider SDKs
-- Lighter weight
-- More control
+**CrewAI** (Recommended)
+- Simple role-based agents with specific jobs
+- Clean abstractions without over-engineering
+- Active community (34k+ stars)
+- Provider-agnostic from the start
+- Aligns with our "assembly line" mental model
+
+**Alternative: Minimal Custom Framework**
+- Direct provider SDKs + custom base classes
+- Maximum control and simplicity
+- No framework lock-in
+- Build only what we need
+
+**Not Recommended: LangChain**
+- Too complex and bloated
+- Frequent breaking changes
+- Over-abstracted for our needs
+
+### Workflow Orchestration
+**Temporal** (Highly Recommended)
+- Durable execution for long-running workflows
+- Handles failures, retries, and restarts automatically
+- Perfect for multi-day ticket workflows
+- Battle-tested at scale (Uber, Netflix)
+- Language-agnostic (Python SDK available)
 
 ### LLM Provider Abstraction
 **LiteLLM** (Recommended)
@@ -61,6 +77,7 @@
 - Simple provider switching
 - Cost tracking built-in
 - Fallback support
+- Works well with any agent framework
 
 ### Web Framework (for webhooks)
 **FastAPI** (Recommended)
@@ -69,27 +86,28 @@
 - Pydantic validation
 - WebSocket support if needed
 
-### Message Queue (Agent Communication)
-**Redis + Celery**
-- Distributed task queue
-- Retry logic
-- Task routing by agent type
-- Result backend
+### Communication Architecture
+**Ticket System (Plane) as Message Bus**
+- No direct agent-to-agent communication
+- All coordination through ticket API
+- Webhook events trigger agent actions
+- Tickets provide audit trail and human visibility
 
-**Alternative: RabbitMQ**
-- More robust
-- Complex routing
-- Higher operational overhead
+**NOT using:**
+- Custom document passing (like MetaGPT)
+- Direct message queues between agents
+- Agent-to-agent chat
 
 ## Proposed Stack
 
 ### Core Stack
 ```
 Language: Python 3.11+
-Agent Framework: LangChain
+Agent Framework: CrewAI (or minimal custom)
+Workflow Orchestration: Temporal
 LLM Abstraction: LiteLLM  
 Web Framework: FastAPI
-Task Queue: Celery + Redis
+Ticket System: Plane (self-hosted)
 Config: Pydantic Settings
 Deployment: Docker + Docker Compose
 ```
@@ -152,22 +170,37 @@ agents:
 - **mypy**: Type checking
 - **pre-commit**: Git hooks
 
+## Architecture Insights from Research
+
+### Key Learnings from MetaGPT
+- **Structured Communication**: Agents produce concrete artifacts (PRDs, design docs)
+- **Role-Based SOPs**: Each role has standard operating procedures
+- **Assembly Line Pattern**: Sequential task processing with clear handoffs
+- **Document Artifacts**: Generate and commit deliverables to Git
+
+### Our Improvements
+- **Use Tickets Instead of Custom Docs**: Proven workflow management
+- **Temporal for Durability**: Handle long-running workflows properly
+- **Provider Flexibility**: Different models for different roles via LiteLLM
+- **Human Inspectable**: All communication visible in ticket system
+
 ## Implementation Phases
 
 ### Phase 1: Foundation
-1. Set up project structure
-2. Implement base agent class
-3. Create webhook receiver
-4. Integrate with Plane API
+1. Set up project structure with CrewAI
+2. Deploy Plane and configure webhooks
+3. Implement base agent class with ticket integration
+4. Set up Temporal for workflow orchestration
+5. Create webhook receiver with FastAPI
 
 ### Phase 2: Core Agents
-1. Implement 2-3 basic agents
-2. Set up Celery task routing
-3. Add LiteLLM configuration
-4. Basic monitoring
+1. Implement Feature Estimator and Requirements Decomposer
+2. Set up Temporal workflows for ticket lifecycle
+3. Add LiteLLM configuration for multi-provider support
+4. Implement artifact generation (docs → Git)
 
 ### Phase 3: Full Team
-1. Implement remaining agents
-2. Add inter-agent communication patterns
-3. Enhance error handling
-4. Performance optimization
+1. Implement remaining specialist agents
+2. Add sophisticated workflow patterns in Temporal
+3. Enhance error handling and retry logic
+4. Performance optimization and monitoring
