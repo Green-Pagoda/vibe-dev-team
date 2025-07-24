@@ -2,8 +2,8 @@
   "separate-pull-requests": true,
   "packages": {
     "planning": {
-      "release-type": "simple"
+      "release-type": "simple",
+      "package-name": "planning"
     }
-  },
-  "plugins": ["node-workspace"]
+  }
 }
