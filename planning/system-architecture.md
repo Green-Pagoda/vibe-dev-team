@@ -14,10 +14,10 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 │                 │  (Ticket System)  │  (OpenAI, etc) │  (ruff, etc)│
 └────────┬────────┴─────────┬─────────┴────────┬──────┴──────┬───────┘
          │                  │                  │             │
-┌────────┴────────┐ ┌───────┴────────┐ ┌──────┴──────┐ ┌───┴────┐
-│ Git Abstraction │ │ Webhook Server │ │  LiteLLM    │ │ Tools  │
-│    Layer        │ │   (FastAPI)    │ │  Wrapper    │ │  CLI   │
-└────────┬────────┘ └───────┬────────┘ └──────┬──────┘ └───┬────┘
+┌────────┴────────┐ ┌───────┴────────┐ ┌──────┴──────┐ ┌───┴────────┐
+│ Git Abstraction │ │ Webhook Server │ │  LiteLLM    │ │ MCP Servers│
+│    Layer        │ │   (FastAPI)    │ │  Wrapper    │ │(Tool Access)│
+└────────┬────────┘ └───────┬────────┘ └──────┬──────┘ └───┬────────┘
          │                  │                  │             │
          └──────────────────┴──────────────────┴─────────────┘
                                     │
@@ -31,6 +31,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
         ├──────────────────────────────────────────────────────┤
         │             CrewAI Agent Framework                    │
         │          (Role-based Agent Execution)                │
+        │               + MCP Client Integration               │
         ├────────────┬────────────┬────────────┬────────────────┤
         │  Feature   │Requirements│   Code     │    Test        │
         │ Estimator  │Decomposer  │ Generator  │  Runner        │
@@ -75,12 +76,13 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
   - Receives tasks from Temporal workflows
   - Uses Plane API client for ticket operations
   - Leverages LiteLLM for provider-agnostic LLM access
-  - Executes development tools through CLI interface
+  - **MCP Client Integration**: Each agent acts as MCP client accessing standardized tool servers
 - **Agent Configuration**: Each specialized agent (Feature Estimator, etc.) is implemented as a CrewAI agent with:
   - Custom system prompts for their specific role
-  - Tailored tool sets for their domain
+  - **MCP-enabled tool access** for standardized development operations
   - Optimized LLM model selection via LiteLLM
   - Role-specific memory and context handling
+  - **Secure tool permissions** via MCP authentication
 
 ### 4. External Integrations
 
@@ -100,10 +102,18 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 - Support for GitHub, GitLab, etc.
 - Commit, branch, PR management
 
-#### Tool CLI Interface
-- Containerized tool execution
-- Resource limits per agent
-- Output parsing and error handling
+#### MCP Server Integration
+- **Purpose**: Standardized protocol for agent-tool communication
+- **Architecture**: Client-server model with secure OAuth 2.1 authentication
+- **Capabilities**:
+  - Tools: Agent-controlled actions (ruff, mypy, git operations)
+  - Resources: Context provision (codebase analysis, documentation)
+  - Prompts: User-invoked specialized interactions
+- **Benefits**:
+  - Unified interface across all development tools
+  - Real-time bi-directional communication via Streamable HTTP
+  - Provider-agnostic integration (compatible with OpenAI, Google adoption)
+  - Enhanced security with permission-based access control
 
 ## Workflow Example
 
@@ -124,12 +134,12 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
    ├─→ Creates subtask tickets with clear acceptance criteria
    └─→ Links subtasks to parent via Plane API
    │
-6. For each subtask (CrewAI agents execute in parallel):
-   ├─→ Code Generator Agent (writes implementation)
-   ├─→ Style Enforcer Agent (applies formatting/conventions)
-   ├─→ Security Auditor Agent (scans for vulnerabilities)
-   ├─→ Test Generator Agent (creates comprehensive tests)
-   └─→ QA Manager Agent (validates all work - quality gate)
+6. For each subtask (CrewAI agents execute in parallel via MCP):
+   ├─→ Code Generator Agent (writes implementation via MCP git tools)
+   ├─→ Style Enforcer Agent (applies formatting via MCP ruff/prettier)
+   ├─→ Security Auditor Agent (scans via MCP security tools)
+   ├─→ Test Generator Agent (creates tests via MCP test frameworks)
+   └─→ QA Manager Agent (validates via MCP linting/testing tools)
    │
 7. CrewAI Documentation Manager Agent
    ├─→ Generates docs from code artifacts
@@ -151,10 +161,16 @@ services:
   webhook-server:
     build: ./webhook
     
+  mcp-dev-tools:
+    build: ./mcp-servers
+    ports:
+      - "3001:3001"  # MCP server for development tools
+    
   agent-estimator:
     build: ./agents
     environment:
       - AGENT_TYPE=estimator
+      - MCP_DEV_TOOLS_URL=http://mcp-dev-tools:3001
       
   # ... more agents
 ```
@@ -170,8 +186,9 @@ services:
 1. **Webhook Security**: Validate signatures from Plane
 2. **Agent Isolation**: Separate containers/processes
 3. **API Key Management**: Per-agent credentials
-4. **Tool Sandboxing**: Limited filesystem access
-5. **Network Policies**: Restrict agent communication
+4. **MCP Security**: OAuth 2.1 authentication for tool access
+5. **Tool Permissions**: MCP-based access control per agent role
+6. **Network Policies**: Restrict agent communication to authorized MCP servers
 
 ## Monitoring & Observability
 
@@ -180,12 +197,34 @@ services:
 - **Structured Logging**: JSON logs with correlation IDs
 - **Temporal UI**: Workflow visibility
 
+## MCP Integration Strategy
+
+### Protocol Benefits
+- **Standardization**: Universal interface for agent-tool communication
+- **Security**: OAuth 2.1 authentication and permission-based access control
+- **Real-time**: Streamable HTTP transport for bi-directional communication
+- **Ecosystem**: Compatible with OpenAI and Google's 2025 MCP adoption
+
+### Implementation Approach
+- **MCP Servers**: Containerized services exposing development tools (ruff, mypy, git)
+- **Agent Clients**: Each CrewAI agent configured as MCP client with role-specific permissions
+- **Tool Categories**:
+  - **Tools**: Agent-controlled actions (code formatting, testing, commits)
+  - **Resources**: Context provision (codebase analysis, documentation)
+  - **Prompts**: Specialized user-invoked interactions
+
+### Migration Path
+1. **Phase 1**: Deploy MCP servers alongside existing CLI wrappers
+2. **Phase 2**: Migrate agents to MCP clients incrementally
+3. **Phase 3**: Deprecate custom CLI interface in favor of MCP standard
+
 ## Failure Handling
 
 1. **Webhook failures**: Plane retries with backoff
 2. **Agent failures**: Temporal handles retry logic
 3. **LLM failures**: LiteLLM fallback to alternate models
-4. **Tool failures**: Isolated, won't crash agents
+4. **MCP server failures**: Graceful degradation with fallback tool access
+5. **Tool failures**: Isolated via MCP sandboxing, won't crash agents
 
 ## Scalability
 
