@@ -1,8 +1,12 @@
 import { z } from 'zod';
-import { BaseAgent, type AgentConfig } from '@vibe-dev-team/agent-core';
+import { BaseAgent, type AgentConfig, createPromptLoader, createAgentLogger, type Logger } from '@vibe-dev-team/agent-core';
 import { PlaneMCPClient, type UpdateIssueInput } from '@vibe-dev-team/plane-mcp-client';
 import { Mastra } from '@mastra/core';
 import { generateText } from '@vercel/ai';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Input schema for the feature estimator
 const FeatureEstimatorInputSchema = z.object({
@@ -28,18 +32,33 @@ const FeatureEstimatorOutputSchema = z.object({
 type FeatureEstimatorInput = z.infer<typeof FeatureEstimatorInputSchema>;
 type FeatureEstimatorOutput = z.infer<typeof FeatureEstimatorOutputSchema>;
 
+// Constants
+const COMPLEXITY_POINTS = {
+  'trivial': 1,
+  'small': 2,
+  'medium': 3,
+  'large': 5,
+  'extra-large': 8,
+} as const;
+
+const AGENT_VERSION = '0.2.0';
+const AGENT_NAME = 'Feature Estimator';
+
 export class FeatureEstimatorAgent extends BaseAgent {
   private planeClient: PlaneMCPClient;
+  private promptLoader = createPromptLoader(__dirname);
+  private logger: Logger;
 
   constructor(mastra: Mastra, planeClient: PlaneMCPClient) {
     const config: AgentConfig = {
-      name: 'Feature Estimator',
+      name: AGENT_NAME,
       description: 'Estimates complexity and effort for new features using official Plane MCP integration',
-      version: '0.2.0',
+      version: AGENT_VERSION,
       capabilities: ['feature-estimation'],
     };
     super(config, mastra);
     this.planeClient = planeClient;
+    this.logger = createAgentLogger(AGENT_NAME, AGENT_VERSION);
   }
 
   getInputSchema() {
@@ -51,103 +70,89 @@ export class FeatureEstimatorAgent extends BaseAgent {
   }
 
   async execute(input: FeatureEstimatorInput): Promise<FeatureEstimatorOutput> {
-    // Prepare prompt for the LLM
+    const executionId = `${input.issueId}-${Date.now()}`;
+    const logger = this.logger.child({ executionId, projectId: input.projectId, issueId: input.issueId });
+    
+    logger.info('Starting feature estimation', { title: input.title });
+    
     const prompt = this.buildEstimationPrompt(input);
+    const response = await this.generateLLMEstimation(prompt);
+    const estimation = this.parseAndValidateResponse(response.text);
+    
+    logger.info('Estimation completed', { 
+      complexity: estimation.complexity, 
+      estimatedHours: estimation.estimatedHours,
+      confidence: estimation.confidence 
+    });
+    
+    // Update Plane issue with estimation (non-blocking)
+    this.updatePlaneIssueAsync(input.projectId, input.issueId, estimation, logger);
+    
+    return estimation;
+  }
 
-    // Generate estimation using LLM
-    const response = await generateText({
+  private async generateLLMEstimation(prompt: string) {
+    return generateText({
       model: this.mastra.llm.model,
       prompt,
-      system: `You are an expert software architect and project estimator. 
-        Analyze the given feature request and provide a detailed complexity estimation.
-        Consider technical requirements, potential dependencies, and risks.
-        Respond in JSON format matching the specified schema.`,
+      system: this.getSystemPrompt(),
     });
+  }
 
-    // Parse and validate the response
+  private getSystemPrompt(): string {
+    return this.promptLoader.getSystemPrompt();
+  }
+
+  private parseAndValidateResponse(responseText: string): FeatureEstimatorOutput {
+    // Parse JSON response
+    let parsedResponse: unknown;
     try {
-      let parsedResponse: unknown;
-      try {
-        parsedResponse = JSON.parse(response.text);
-      } catch (parseError) {
-        throw this.createError(
-          'LLM_RESPONSE_INVALID_JSON',
-          'LLM response is not valid JSON',
-          { response: response.text, parseError: parseError instanceof Error ? parseError.message : String(parseError) }
-        );
-      }
-
-      // Validate the parsed response against our schema
-      const validationResult = this.getOutputSchema().safeParse(parsedResponse);
-      if (!validationResult.success) {
-        throw this.createError(
-          'LLM_RESPONSE_INVALID_SCHEMA',
-          'LLM response does not match expected schema',
-          { response: parsedResponse, errors: validationResult.error.errors }
-        );
-      }
-
-      const estimation = validationResult.data;
-      
-      // Update the Plane issue with the estimation
-      try {
-        await this.updatePlaneIssue(input.projectId, input.issueId, estimation);
-      } catch (planeError) {
-        // Log the error but don't fail the entire operation
-        console.error('Failed to update Plane issue:', planeError);
-        // Still return the estimation even if Plane update failed
-      }
-      
-      return estimation;
-    } catch (error) {
-      // Re-throw our custom errors
-      if (typeof error === 'object' && error !== null && 'code' in error) {
-        throw error;
-      }
-      
-      // Handle unexpected errors
+      parsedResponse = JSON.parse(responseText);
+    } catch (parseError) {
       throw this.createError(
-        'ESTIMATION_EXECUTION_ERROR',
-        'Unexpected error during estimation',
-        { originalError: error instanceof Error ? error.message : String(error) }
+        'LLM_RESPONSE_INVALID_JSON',
+        'LLM response is not valid JSON',
+        { response: responseText, parseError: parseError instanceof Error ? parseError.message : String(parseError) }
       );
+    }
+
+    // Validate against schema
+    const validationResult = this.getOutputSchema().safeParse(parsedResponse);
+    if (!validationResult.success) {
+      throw this.createError(
+        'LLM_RESPONSE_INVALID_SCHEMA',
+        'LLM response does not match expected schema',
+        { response: parsedResponse, errors: validationResult.error.errors }
+      );
+    }
+
+    return validationResult.data;
+  }
+
+  private async updatePlaneIssueAsync(
+    projectId: string, 
+    issueId: string, 
+    estimation: FeatureEstimatorOutput,
+    logger: Logger
+  ): Promise<void> {
+    try {
+      await this.updatePlaneIssue(projectId, issueId, estimation);
+      logger.info('Successfully updated Plane issue');
+    } catch (error) {
+      logger.error('Failed to update Plane issue (non-blocking)', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
   private buildEstimationPrompt(input: FeatureEstimatorInput): string {
-    // Sanitize inputs to prevent prompt injection
-    const sanitizedTitle = this.sanitizeInput(input.title);
-    const sanitizedDescription = this.sanitizeInput(input.description);
-    const sanitizedLabels = input.labels?.map(label => this.sanitizeInput(label)).join(', ') || 'None';
+    const title = this.sanitizeInput(input.title);
+    const description = this.sanitizeInput(input.description);
+    const labels = input.labels?.map(label => this.sanitizeInput(label)).join(', ') || 'None';
 
-    return `
-Feature Title: ${sanitizedTitle}
-
-Description:
-${sanitizedDescription}
-
-Labels: ${sanitizedLabels}
-
-Please analyze this feature request and provide:
-1. Complexity rating (trivial/small/medium/large/extra-large)
-2. Estimated hours of development effort
-3. Confidence level in the estimate
-4. Detailed reasoning for the estimate
-5. Technical considerations
-6. Potential dependencies
-7. Identified risks
-
-Response format:
-{
-  "complexity": "medium",
-  "estimatedHours": 16,
-  "confidence": "high",
-  "reasoning": "...",
-  "technicalConsiderations": ["..."],
-  "dependencies": ["..."],
-  "risks": ["..."]
-}
-`;
+    return this.promptLoader.processPrompt('estimation.md', {
+      title,
+      description,
+      labels,
+    });
   }
 
   private sanitizeInput(input: string): string {
@@ -197,17 +202,10 @@ ${estimation.dependencies.map(dep => `- ${dep}`).join('\n')}
 ${estimation.risks.map(risk => `- ⚠️ ${risk}`).join('\n')}
 
 ---
-*Estimated by Feature Estimator Agent v0.1.0*`;
+*Estimated by ${AGENT_NAME} v${AGENT_VERSION}*`;
   }
 
   private complexityToPoints(complexity: FeatureEstimatorOutput['complexity']): number {
-    const pointMap: Record<FeatureEstimatorOutput['complexity'], number> = {
-      'trivial': 1,
-      'small': 2,
-      'medium': 3,
-      'large': 5,
-      'extra-large': 8,
-    };
-    return pointMap[complexity];
+    return COMPLEXITY_POINTS[complexity];
   }
 }
