@@ -53,19 +53,28 @@ All architecture and design documentation has been created:
 - Tool integrations and development workflow
 - Type safety strategy with mypyc compilation
 
-## Implementation Architecture
-- **Webhook Server**: FastAPI receiving Plane events
-- **Orchestration**: Temporal for durable workflows
-- **Agents**: Separate worker pools per role
+## Implementation Architecture (Updated 2025-07-29)
+- **Language**: TypeScript throughout (developer preference)
+- **Webhook Server**: Hono/Bun receiving Plane events
+- **Orchestration**: Mastra vNext workflows (Temporal backend when available)
+- **Agent Framework**: Mastra for TypeScript-native AI agents
+- **LLM Abstraction**: Vercel AI SDK (replaces LiteLLM)
+- **Tool Integration**: MCP (Model Context Protocol) for standardized access
 - **Communication**: Only through Plane ticket API
-- **Type Safety**: mypyc compilation + strict CI checks
+- **Type Safety**: Native TypeScript strict mode
+
+## Technology Stack Changes
+- **From**: Python/CrewAI/mypyc/FastAPI/LiteLLM
+- **To**: TypeScript/Mastra/Bun/Hono/Vercel AI SDK
+- **Rationale**: Developer preference for TypeScript, cleaner single-language architecture
 
 ## Next Steps
 1. Merge planning branch to master
 2. Create implementation branch
-3. Set up base project with mypyc build system
-4. Deploy Plane and Temporal infrastructure
-5. Implement first agent (Feature Estimator)
+3. Set up TypeScript project with Mastra
+4. Deploy Plane infrastructure
+5. Implement first Mastra agent (Feature Estimator)
+6. Use Mastra workflows initially, migrate to Temporal when backend support ships
 
 ## Repository Conventions
 - Changes to the planning docs under folder planning/ should be considered enhancements not docs changes, as the docs themselves are the artifact of that component.

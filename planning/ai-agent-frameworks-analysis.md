@@ -193,10 +193,26 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Used by RBC, John Deere
 - Bleeding-edge features
 
-### 14. **Mastra**
+### 14. **Mastra** ⭐ 7.5k+ stars
+**Status**: Rapidly growing (went viral on HN/GitHub)
 **Focus**: TypeScript framework for AI apps
-- Opinionated approach
-- Quick development focus
+
+**Strengths**:
+- TypeScript-first with excellent DX
+- Graph-based workflows with state machines
+- Built-in OpenTelemetry tracing
+- Unified API for LLMs, tools, RAG
+- Production features (evals, monitoring)
+- Vercel AI SDK integration
+- Local agent playground
+- Quick setup (`npm create mastra@latest`)
+
+**Weaknesses**:
+- TypeScript-only (no Python support)
+- Newer framework (started Oct 2024)
+- Would fragment architecture if mixed with Python agents
+
+**Best for**: Greenfield TypeScript projects wanting modern agent framework
 
 ### 15. **Other Notable Mentions**:
 - **Modus**: Serverless agents in Go/AssemblyScript
