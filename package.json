@@ -1,0 +1,26 @@
+{
+  "name": "vibe-dev-team",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "services/agents/*"
+  ],
+  "scripts": {
+    "dev": "docker-compose up",
+    "build": "docker-compose build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write '**/*.{ts,tsx,json,md}'"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "typescript": "^5.7.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.4.0"
+  }
+}
