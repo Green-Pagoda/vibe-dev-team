@@ -1,5 +1,28 @@
 # Tooling & Frameworks Analysis
 
+## Framework Decision: CrewAI over Mastra (2025-07-29)
+
+After evaluating Mastra (TypeScript agent framework), we're staying with CrewAI for the following reasons:
+
+**Complexity Cost Outweighs Benefits**:
+- Mixing TypeScript (Mastra) + Python (CrewAI) agents adds significant complexity
+- Cross-language serialization overhead
+- Double deployment and debugging complexity
+- Team needs expertise in both ecosystems
+
+**Our Python Stack Already Provides**:
+- Type safety via mypyc compilation
+- MCP integration via Python clients
+- Mature ecosystem (CrewAI 31k+ stars vs Mastra 7.5k)
+- Single language throughout agent layer
+
+**Mastra is excellent but not for us**:
+- Better suited for greenfield TypeScript projects
+- Would fragment our architecture unnecessarily
+- Benefits (TS type safety, modern DX) don't justify the complexity
+
+**Decision**: Continue with CrewAI + Python + MCP integration for architectural simplicity.
+
 ## Core Requirements
 - **Multi-LLM Support**: Easy switching between providers (OpenAI, Anthropic, local models)
 - **Async Architecture**: Agents as independent processes
