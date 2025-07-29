@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  plane-event-dispatcher:
+    build:
+      context: .
+      dockerfile: services/plane-event-dispatcher/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PLANE_API_URL=${PLANE_API_URL:-http://plane-api:8000}
+      - MASTRA_CONFIG_PATH=/app/config/mastra.json
+    volumes:
+      - ./services/plane-event-dispatcher:/app
+      - ./packages:/packages
+    depends_on:
+      - plane-db
+    command: bun run --watch src/index.ts
+
+  feature-estimator:
+    build:
+      context: .
+      dockerfile: services/agents/Dockerfile.agent
+      args:
+        AGENT_PATH: services/agents/feature-estimator
+        AGENT_TYPE: feature-estimator
+    environment:
+      - NODE_ENV=development
+      - AGENT_TYPE=feature-estimator
+      - PLANE_API_URL=${PLANE_API_URL:-http://plane-api:8000}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./services/agents/feature-estimator:/app
+      - ./packages:/packages
+    command: bun run --watch src/index.ts
+
+  # Plane services (for local dev)
+  plane-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: plane
+      POSTGRES_PASSWORD: plane
+      POSTGRES_DB: plane
+    volumes:
+      - plane-db-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+
+volumes:
+  plane-db-data:
+  redis-data:

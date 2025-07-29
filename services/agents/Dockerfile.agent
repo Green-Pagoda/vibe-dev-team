@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1
+# Shared Dockerfile for all Mastra agents
+FROM oven/bun:1.1-alpine AS base
+WORKDIR /app
+
+# Development stage
+FROM base AS dev
+RUN apk add --no-cache git
+# Copy package files - will be overridden by build args
+ARG AGENT_PATH
+COPY ${AGENT_PATH}/package.json ${AGENT_PATH}/bun.lockb* ./
+COPY packages /packages
+RUN bun install --frozen-lockfile
+COPY ${AGENT_PATH}/src ./src
+COPY ${AGENT_PATH}/tsconfig.json ./
+CMD ["bun", "run", "--watch", "src/index.ts"]
+
+# Dependencies stage
+FROM base AS deps
+ARG AGENT_PATH
+COPY ${AGENT_PATH}/package.json ${AGENT_PATH}/bun.lockb* ./
+COPY packages /packages
+RUN bun install --frozen-lockfile --production
+
+# Build stage
+FROM base AS build
+ARG AGENT_PATH
+COPY ${AGENT_PATH}/package.json ${AGENT_PATH}/bun.lockb* ./
+COPY packages /packages
+RUN bun install --frozen-lockfile
+COPY ${AGENT_PATH}/src ./src
+COPY ${AGENT_PATH}/tsconfig.json ./
+RUN bun build src/index.ts --target bun --outdir dist
+
+# Production stage
+FROM base AS production
+ENV NODE_ENV=production
+ARG AGENT_TYPE
+ENV AGENT_TYPE=${AGENT_TYPE}
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /packages /packages
+EXPOSE 8080
+CMD ["bun", "run", "dist/index.js"]
