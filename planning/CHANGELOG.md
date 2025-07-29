@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Green-Pagoda/vibe-dev-team/compare/planning-v1.1.0...planning-v1.2.0) (2025-07-29)
+
+
+### Features
+
+* integrate MCP and pivot to TypeScript/Mastra framework ([#9](https://github.com/Green-Pagoda/vibe-dev-team/issues/9)) ([a44b0a9](https://github.com/Green-Pagoda/vibe-dev-team/commit/a44b0a9a5e128e4a418e5b6b4576b616e8d74a2b))
+
 ## [1.1.0](https://github.com/Green-Pagoda/vibe-dev-team/compare/planning-v1.0.0...planning-v1.1.0) (2025-07-24)
 
 
