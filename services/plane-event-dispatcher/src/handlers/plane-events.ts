@@ -31,6 +31,18 @@ const eventHandlers: Record<string, (payload: PlaneWebhookPayload) => Promise<vo
   'issue_comment.updated': handleCommentUpdated,
 };
 
+export class WebhookHandlerError extends Error {
+  constructor(
+    message: string,
+    public eventKey: string,
+    public webhookId: string,
+    public cause?: Error
+  ) {
+    super(message);
+    this.name = 'WebhookHandlerError';
+  }
+}
+
 export async function handlePlaneEvent(payload: PlaneWebhookPayload): Promise<void> {
   const eventKey = `${payload.event}.${payload.action}`;
   const handler = eventHandlers[eventKey];
@@ -43,13 +55,35 @@ export async function handlePlaneEvent(payload: PlaneWebhookPayload): Promise<vo
   try {
     await handler(payload);
   } catch (error) {
-    console.error(`Error handling ${eventKey}:`, error);
-    throw error;
+    const webhookError = new WebhookHandlerError(
+      `Failed to handle webhook event ${eventKey}`,
+      eventKey,
+      payload.webhook_id,
+      error instanceof Error ? error : new Error(String(error))
+    );
+    
+    console.error(`Error handling ${eventKey}:`, {
+      webhookId: payload.webhook_id,
+      workspaceId: payload.workspace_id,
+      projectId: payload.project_id,
+      error: webhookError.cause?.message,
+    });
+    
+    throw webhookError;
   }
 }
 
 async function handleIssueCreated(payload: PlaneWebhookPayload): Promise<void> {
-  console.log('New issue created:', payload.data);
+  // Type guard to ensure we have the right payload type
+  if (payload.event !== 'issue' || payload.action !== 'created') {
+    throw new Error(`Invalid payload for handleIssueCreated: ${payload.event}.${payload.action}`);
+  }
+
+  console.log('New issue created:', {
+    issueId: payload.data.id,
+    title: payload.data.name,
+    projectId: payload.project_id,
+  });
   
   // TODO: Trigger Mastra workflow for new issue
   // 1. Analyze issue type
@@ -58,23 +92,53 @@ async function handleIssueCreated(payload: PlaneWebhookPayload): Promise<void> {
 }
 
 async function handleIssueUpdated(payload: PlaneWebhookPayload): Promise<void> {
-  console.log('Issue updated:', payload.data);
+  // Type guard
+  if (payload.event !== 'issue' || payload.action !== 'updated') {
+    throw new Error(`Invalid payload for handleIssueUpdated: ${payload.event}.${payload.action}`);
+  }
+
+  console.log('Issue updated:', {
+    issueId: payload.data.id,
+    title: payload.data.name,
+  });
   
   // TODO: Check if update requires agent action
 }
 
 async function handleIssueDeleted(payload: PlaneWebhookPayload): Promise<void> {
-  console.log('Issue deleted:', payload.data);
+  // Type guard
+  if (payload.event !== 'issue' || payload.action !== 'deleted') {
+    throw new Error(`Invalid payload for handleIssueDeleted: ${payload.event}.${payload.action}`);
+  }
+
+  console.log('Issue deleted:', {
+    issueId: payload.data.id,
+  });
   
   // TODO: Cancel any running workflows for this issue
 }
 
 async function handleCommentCreated(payload: PlaneWebhookPayload): Promise<void> {
-  console.log('New comment:', payload.data);
+  // Type guard
+  if (payload.event !== 'issue_comment' || payload.action !== 'created') {
+    throw new Error(`Invalid payload for handleCommentCreated: ${payload.event}.${payload.action}`);
+  }
+
+  console.log('New comment:', {
+    commentId: payload.data.id,
+    issueId: payload.data.issue,
+  });
   
   // TODO: Check if comment is from user requesting agent action
 }
 
 async function handleCommentUpdated(payload: PlaneWebhookPayload): Promise<void> {
-  console.log('Comment updated:', payload.data);
+  // Type guard
+  if (payload.event !== 'issue_comment' || payload.action !== 'updated') {
+    throw new Error(`Invalid payload for handleCommentUpdated: ${payload.event}.${payload.action}`);
+  }
+
+  console.log('Comment updated:', {
+    commentId: payload.data.id,
+  });
 }

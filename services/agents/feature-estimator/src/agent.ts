@@ -66,26 +66,67 @@ export class FeatureEstimatorAgent extends BaseAgent {
 
     // Parse and validate the response
     try {
-      const estimation = JSON.parse(response.text) as FeatureEstimatorOutput;
+      let parsedResponse: unknown;
+      try {
+        parsedResponse = JSON.parse(response.text);
+      } catch (parseError) {
+        throw this.createError(
+          'LLM_RESPONSE_INVALID_JSON',
+          'LLM response is not valid JSON',
+          { response: response.text, parseError: parseError instanceof Error ? parseError.message : String(parseError) }
+        );
+      }
+
+      // Validate the parsed response against our schema
+      const validationResult = this.getOutputSchema().safeParse(parsedResponse);
+      if (!validationResult.success) {
+        throw this.createError(
+          'LLM_RESPONSE_INVALID_SCHEMA',
+          'LLM response does not match expected schema',
+          { response: parsedResponse, errors: validationResult.error.errors }
+        );
+      }
+
+      const estimation = validationResult.data;
       
       // Update the Plane issue with the estimation
-      await this.updatePlaneIssue(input.projectId, input.issueId, estimation);
+      try {
+        await this.updatePlaneIssue(input.projectId, input.issueId, estimation);
+      } catch (planeError) {
+        // Log the error but don't fail the entire operation
+        console.error('Failed to update Plane issue:', planeError);
+        // Still return the estimation even if Plane update failed
+      }
       
       return estimation;
     } catch (error) {
-      console.error('Failed to parse LLM response:', error);
-      throw new Error('Invalid estimation response from LLM');
+      // Re-throw our custom errors
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        throw error;
+      }
+      
+      // Handle unexpected errors
+      throw this.createError(
+        'ESTIMATION_EXECUTION_ERROR',
+        'Unexpected error during estimation',
+        { originalError: error instanceof Error ? error.message : String(error) }
+      );
     }
   }
 
   private buildEstimationPrompt(input: FeatureEstimatorInput): string {
+    // Sanitize inputs to prevent prompt injection
+    const sanitizedTitle = this.sanitizeInput(input.title);
+    const sanitizedDescription = this.sanitizeInput(input.description);
+    const sanitizedLabels = input.labels?.map(label => this.sanitizeInput(label)).join(', ') || 'None';
+
     return `
-Feature Title: ${input.title}
+Feature Title: ${sanitizedTitle}
 
 Description:
-${input.description}
+${sanitizedDescription}
 
-Labels: ${input.labels?.join(', ') || 'None'}
+Labels: ${sanitizedLabels}
 
 Please analyze this feature request and provide:
 1. Complexity rating (trivial/small/medium/large/extra-large)
@@ -107,6 +148,15 @@ Response format:
   "risks": ["..."]
 }
 `;
+  }
+
+  private sanitizeInput(input: string): string {
+    // Remove potential prompt injection attempts
+    return input
+      .replace(/\n\s*system:/gi, '\n[SYSTEM]:')
+      .replace(/\n\s*user:/gi, '\n[USER]:')
+      .replace(/\n\s*assistant:/gi, '\n[ASSISTANT]:')
+      .trim();
   }
 
   private async updatePlaneIssue(

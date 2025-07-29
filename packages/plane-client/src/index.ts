@@ -6,6 +6,24 @@ export interface PlaneClientConfig {
   workspaceSlug: string;
 }
 
+export class PlaneAPIError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number,
+    public response?: string
+  ) {
+    super(message);
+    this.name = 'PlaneAPIError';
+  }
+}
+
+export class PlaneClientError extends Error {
+  constructor(message: string, public cause?: Error) {
+    super(message);
+    this.name = 'PlaneClientError';
+  }
+}
+
 // Plane API response types
 export interface PlaneIssue {
   id: string;
@@ -61,20 +79,36 @@ export class PlaneClient {
   ): Promise<T> {
     const url = `${this.config.apiUrl}/api/v1/workspaces/${this.config.workspaceSlug}${path}`;
     
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'X-API-Key': this.config.apiKey,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'X-API-Key': this.config.apiKey,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error(`Plane API error: ${response.statusText}`);
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        throw new PlaneAPIError(
+          `Plane API error: ${response.statusText}`,
+          response.status,
+          errorText
+        );
+      }
+
+      const data = await response.json();
+      return data as T;
+    } catch (error) {
+      if (error instanceof PlaneAPIError) {
+        throw error;
+      }
+      throw new PlaneClientError(
+        `Failed to make request to ${url}`,
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
-
-    return response.json() as Promise<T>;
   }
 
   async getIssue(projectId: string, issueId: string): Promise<PlaneIssue> {
