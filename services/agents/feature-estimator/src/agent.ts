@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { BaseAgent, type AgentConfig } from '@vibe-dev-team/agent-core';
-import { PlaneClient, type PlaneIssueUpdate } from '@vibe-dev-team/plane-client';
+import { PlaneMCPClient, type UpdateIssueInput } from '@vibe-dev-team/plane-mcp-client';
 import { Mastra } from '@mastra/core';
 import { generateText } from '@vercel/ai';
 
@@ -29,13 +29,13 @@ type FeatureEstimatorInput = z.infer<typeof FeatureEstimatorInputSchema>;
 type FeatureEstimatorOutput = z.infer<typeof FeatureEstimatorOutputSchema>;
 
 export class FeatureEstimatorAgent extends BaseAgent {
-  private planeClient: PlaneClient;
+  private planeClient: PlaneMCPClient;
 
-  constructor(mastra: Mastra, planeClient: PlaneClient) {
+  constructor(mastra: Mastra, planeClient: PlaneMCPClient) {
     const config: AgentConfig = {
       name: 'Feature Estimator',
-      description: 'Estimates complexity and effort for new features',
-      version: '0.1.0',
+      description: 'Estimates complexity and effort for new features using official Plane MCP integration',
+      version: '0.2.0',
       capabilities: ['feature-estimation'],
     };
     super(config, mastra);
@@ -170,7 +170,7 @@ Response format:
 
     // Update issue labels based on complexity
     const complexityLabel = `complexity:${estimation.complexity}`;
-    const updateData: PlaneIssueUpdate = {
+    const updateData: UpdateIssueInput = {
       labels: [complexityLabel],
       estimate_point: this.complexityToPoints(estimation.complexity),
     };

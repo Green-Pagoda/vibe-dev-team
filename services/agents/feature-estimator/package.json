@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@vibe-dev-team/agent-core": "workspace:*",
-    "@makeplane/plane-mcp-server": "^0.1.4",
-    "@modelcontextprotocol/sdk": "^1.9.0",
+    "@vibe-dev-team/plane-mcp-client": "workspace:*",
     "@mastra/core": "^0.1.0",
     "@vercel/ai": "^1.0.0",
     "openai": "^4.0.0",

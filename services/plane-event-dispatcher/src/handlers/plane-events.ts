@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { PlaneIssue, PlaneComment } from '@vibe-dev-team/plane-client';
+import type { PlaneIssue, PlaneComment } from '@vibe-dev-team/plane-mcp-client';
 
 // Base webhook payload
 interface BaseWebhookPayload {
