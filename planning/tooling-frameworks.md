@@ -1,27 +1,36 @@
 # Tooling & Frameworks Analysis
 
-## Framework Decision: CrewAI over Mastra (2025-07-29)
+## Framework Decision: TypeScript with Mastra (2025-07-29)
 
-After evaluating Mastra (TypeScript agent framework), we're staying with CrewAI for the following reasons:
+After thorough evaluation, we're adopting Mastra as our agent framework for the following reasons:
 
-**Complexity Cost Outweighs Benefits**:
-- Mixing TypeScript (Mastra) + Python (CrewAI) agents adds significant complexity
-- Cross-language serialization overhead
-- Double deployment and debugging complexity
-- Team needs expertise in both ecosystems
+**TypeScript Advantages**:
+- Developer preference for TypeScript = higher productivity
+- Native type safety without compilation workarounds
+- Better IDE support and refactoring capabilities
+- Unified tech stack potential with Temporal TypeScript SDK
+- Modern async/await patterns throughout
 
-**Our Python Stack Already Provides**:
-- Type safety via mypyc compilation
-- MCP integration via Python clients
-- Mature ecosystem (CrewAI 31k+ stars vs Mastra 7.5k)
-- Single language throughout agent layer
+**Mastra Strengths**:
+- Purpose-built for AI agents (not retrofitted)
+- Clean abstractions without over-engineering
+- Built-in observability (OpenTelemetry)
+- Unified interface for LLMs, tools, and RAG
+- Active development (7.5k+ stars, viral growth)
+- Future Temporal backend support planned
 
-**Mastra is excellent but not for us**:
-- Better suited for greenfield TypeScript projects
-- Would fragment our architecture unnecessarily
-- Benefits (TS type safety, modern DX) don't justify the complexity
+**Architecture Benefits**:
+- Single language throughout the system
+- Native MCP support in TypeScript
+- Cleaner integration with web technologies
+- Growing TypeScript AI ecosystem
 
-**Decision**: Continue with CrewAI + Python + MCP integration for architectural simplicity.
+**Migration Strategy**:
+1. **Phase 1**: Use Mastra's built-in workflows for agent coordination
+2. **Phase 2**: When Temporal backend support ships, migrate for durability
+3. **Fallback**: If needed, integrate Temporal SDK directly
+
+**Decision**: Adopt TypeScript/Mastra for better developer experience and architectural coherence.
 
 ## Core Requirements
 - **Multi-LLM Support**: Easy switching between providers (OpenAI, Anthropic, local models)
@@ -32,45 +41,56 @@ After evaluating Mastra (TypeScript agent framework), we're staying with CrewAI 
 
 ## Language Choice
 
-### Python (Recommended)
+### TypeScript/Node.js (Selected)
 **Pros:**
-- Excellent LLM libraries (LangChain, LiteLLM, OpenAI SDK)
-- Strong async support (asyncio, FastAPI)
-- Rich ecosystem for AI/ML tasks
-- Simple deployment and packaging
+- Excellent LLM library support (Vercel AI SDK, OpenAI, Anthropic)
+- Native async/await patterns
+- Strong type safety without compilation workarounds
+- Mastra framework purpose-built for AI agents
+- Seamless MCP integration
+- Better IDE support and developer experience
 
 **Cons:**
-- GIL limitations (mitigated by multi-process architecture)
-- Type safety requires discipline
+- Smaller AI/ML ecosystem than Python
+- Some specialized tools may require CLI execution
+
+### Python
+**Pros:**
+- Largest AI/ML ecosystem
+- Mature agent frameworks (CrewAI, AutoGen)
+- Rich scientific computing libraries
+
+**Cons:**
+- Type safety requires mypyc or strict discipline
+- GIL limitations for concurrent operations
+- Less elegant async patterns
 
 ### Go
 **Pros:**
 - Excellent concurrency model
 - Single binary deployment
 - Strong type safety
-- Great for webhook servers
 
 **Cons:**
-- Fewer mature LLM libraries
-- More verbose than Python
-
-### TypeScript/Node.js
-**Pros:**
-- Good LLM library support
-- Native async/await
-- Frontend integration if needed
-
-**Cons:**
-- Runtime overhead
-- Dependency management complexity
+- Limited AI/LLM libraries
+- Would require significant custom development
 
 ## Framework Architecture
 
 ### Agent Framework Options
 
-**CrewAI** (Recommended)
-- Simple role-based agents with specific jobs
+**Mastra** (Selected)
+- TypeScript-native AI agent framework
+- Built-in workflows, agents, tools, and RAG
 - Clean abstractions without over-engineering
+- Excellent developer experience
+- Future Temporal backend support
+
+**CrewAI** (Study for patterns)
+- Most similar to our hyper-specialized agent approach
+- Role-based agents with specific jobs
+- Production-tested patterns we can adapt
+- Learn from their agent coordination strategies
 - Active community (34k+ stars)
 - Provider-agnostic from the start
 - Aligns with our "assembly line" mental model

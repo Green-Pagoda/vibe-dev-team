@@ -15,22 +15,23 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 └────────┬────────┴─────────┬─────────┴────────┬──────┴──────┬───────┘
          │                  │                  │             │
 ┌────────┴────────┐ ┌───────┴────────┐ ┌──────┴──────┐ ┌───┴────────┐
-│ Git Abstraction │ │ Webhook Server │ │  LiteLLM    │ │ MCP Servers│
-│    Layer        │ │   (FastAPI)    │ │  Wrapper    │ │(Tool Access)│
+│ Git Abstraction │ │ Webhook Server │ │ Vercel AI   │ │ MCP Servers│
+│    Layer        │ │  (Hono/Bun)    │ │    SDK      │ │(Tool Access)│
 └────────┬────────┘ └───────┬────────┘ └──────┬──────┘ └───┬────────┘
          │                  │                  │             │
          └──────────────────┴──────────────────┴─────────────┘
                                     │
                           ┌─────────┴─────────┐
-                          │    Temporal       │
-                          │  Orchestrator     │
+                          │  Mastra vNext     │
+                          │  Workflows        │
+                          │ (Temporal later)  │
                           └─────────┬─────────┘
                                     │
         ┌───────────────────────────┴───────────────────────────┐
         │                   Agent Workers                        │
         ├──────────────────────────────────────────────────────┤
-        │             CrewAI Agent Framework                    │
-        │          (Role-based Agent Execution)                │
+        │              Mastra Agent Framework                   │
+        │          (TypeScript Agent Execution)                 │
         │               + MCP Client Integration               │
         ├────────────┬────────────┬────────────┬────────────────┤
         │  Feature   │Requirements│   Code     │    Test        │
@@ -43,7 +44,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 
 ## Component Details
 
-### 1. Webhook Server (FastAPI)
+### 1. Webhook Server (Hono/Bun)
 - **Purpose**: Receives events from Plane ticket system
 - **Responsibilities**:
   - Validate webhook signatures
@@ -51,13 +52,19 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
   - Trigger appropriate Temporal workflows
   - Return acknowledgment to Plane
 
-### 2. Temporal Orchestrator
-- **Purpose**: Manages durable, long-running workflows
+### 2. Workflow Orchestration
+#### Phase 1: Mastra vNext Workflows
+- **Purpose**: Lightweight agent coordination
 - **Responsibilities**:
   - Coordinate agent execution order
-  - Handle failures and retries
-  - Maintain workflow state
+  - Handle basic retries and error handling
+  - Manage workflow state with external storage
   - Enforce quality gates between stages
+
+#### Phase 2: Temporal Integration (Future)
+- **Purpose**: Durable, long-running workflows
+- **Migration**: When Mastra ships Temporal backend support
+- **Benefits**: Full durability, event sourcing, proven reliability
 
 ### 3. Agent Workers
 - **Purpose**: Specialized task execution
@@ -65,7 +72,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 - **Communication**: Only through Plane API (no direct agent-to-agent)
 - **State**: Stateless - all context from tickets
 
-#### CrewAI Agent Framework
+#### Mastra Agent Framework
 - **Purpose**: Provides role-based agent execution foundation
 - **Responsibilities**:
   - Define agent roles with specific capabilities and tools
@@ -73,14 +80,14 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
   - Execute agent tasks with consistent error handling
   - Provide memory and context management per agent
 - **Integration**: 
-  - Receives tasks from Temporal workflows
+  - Receives tasks from Mastra workflows
   - Uses Plane API client for ticket operations
-  - Leverages LiteLLM for provider-agnostic LLM access
+  - Leverages Vercel AI SDK for provider-agnostic LLM access
   - **MCP Client Integration**: Each agent acts as MCP client accessing standardized tool servers
-- **Agent Configuration**: Each specialized agent (Feature Estimator, etc.) is implemented as a CrewAI agent with:
+- **Agent Configuration**: Each specialized agent (Feature Estimator, etc.) is implemented as a Mastra agent with:
   - Custom system prompts for their specific role
   - **MCP-enabled tool access** for standardized development operations
-  - Optimized LLM model selection via LiteLLM
+  - Optimized LLM model selection via Vercel AI SDK
   - Role-specific memory and context handling
   - **Secure tool permissions** via MCP authentication
 
@@ -91,7 +98,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 - Query ticket state and history
 - Manage labels and assignments
 
-#### LiteLLM Wrapper
+#### Vercel AI SDK
 - Unified interface to all LLM providers
 - Model selection per agent role
 - Cost tracking and rate limiting
@@ -120,28 +127,28 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 ```
 1. User creates ticket: "Add user authentication"
    │
-2. Webhook → FastAPI → Temporal
+2. Webhook → Hono/Bun → Mastra Workflow
    │
-3. Temporal starts TicketWorkflow
+3. Mastra starts TicketWorkflow
    │
-4. CrewAI Feature Estimator Agent
+4. Mastra Feature Estimator Agent
    ├─→ Reads ticket via Plane API
    ├─→ Analyzes complexity using specialized tools
    └─→ Updates ticket with structured estimate
    │
-5. CrewAI Requirements Decomposer Agent  
+5. Mastra Requirements Decomposer Agent  
    ├─→ Reads estimated ticket
    ├─→ Creates subtask tickets with clear acceptance criteria
    └─→ Links subtasks to parent via Plane API
    │
-6. For each subtask (CrewAI agents execute in parallel via MCP):
+6. For each subtask (Mastra agents execute in parallel via MCP):
    ├─→ Code Generator Agent (writes implementation via MCP git tools)
    ├─→ Style Enforcer Agent (applies formatting via MCP ruff/prettier)
    ├─→ Security Auditor Agent (scans via MCP security tools)
    ├─→ Test Generator Agent (creates tests via MCP test frameworks)
    └─→ QA Manager Agent (validates via MCP linting/testing tools)
    │
-7. CrewAI Documentation Manager Agent
+7. Mastra Documentation Manager Agent
    ├─→ Generates docs from code artifacts
    └─→ Creates final PR with all changes
 ```
@@ -155,11 +162,12 @@ services:
   plane:
     image: makeplane/plane
   
-  temporal:
-    image: temporalio/server
+  # temporal: # Phase 2 - when Mastra supports Temporal backend
+  #   image: temporalio/server
   
   webhook-server:
     build: ./webhook
+    runtime: bun
     
   mcp-dev-tools:
     build: ./mcp-servers
@@ -195,7 +203,8 @@ services:
 - **OpenTelemetry**: Distributed tracing
 - **Prometheus**: Metrics per agent type
 - **Structured Logging**: JSON logs with correlation IDs
-- **Temporal UI**: Workflow visibility
+- **Mastra Playground**: Local agent development and testing
+- **Temporal UI**: Workflow visibility (Phase 2)
 
 ## MCP Integration Strategy
 
@@ -222,7 +231,7 @@ services:
 
 1. **Webhook failures**: Plane retries with backoff
 2. **Agent failures**: Temporal handles retry logic
-3. **LLM failures**: LiteLLM fallback to alternate models
+3. **LLM failures**: Vercel AI SDK fallback to alternate models
 4. **MCP server failures**: Graceful degradation with fallback tool access
 5. **Tool failures**: Isolated via MCP sandboxing, won't crash agents
 
