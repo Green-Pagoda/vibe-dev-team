@@ -1,0 +1,6 @@
+# Claude
+.tmp.claude/
+
+# Vim
+*.swp
+
