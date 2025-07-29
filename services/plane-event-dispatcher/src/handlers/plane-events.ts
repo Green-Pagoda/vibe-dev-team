@@ -1,15 +1,26 @@
 import { z } from 'zod';
+import type { PlaneIssue, PlaneComment } from '@vibe-dev-team/plane-client';
 
-// Define the webhook payload type
-type PlaneWebhookPayload = {
-  event: string;
-  action: string;
-  data: Record<string, any>;
+// Base webhook payload
+interface BaseWebhookPayload {
   webhook_id: string;
   workspace_id: string;
   project_id?: string;
   timestamp: string;
-};
+}
+
+// Discriminated union for different webhook events
+export type PlaneWebhookPayload = 
+  | (BaseWebhookPayload & {
+      event: 'issue';
+      action: 'created' | 'updated' | 'deleted';
+      data: PlaneIssue;
+    })
+  | (BaseWebhookPayload & {
+      event: 'issue_comment';
+      action: 'created' | 'updated' | 'deleted';
+      data: PlaneComment;
+    });
 
 // Event handlers mapping
 const eventHandlers: Record<string, (payload: PlaneWebhookPayload) => Promise<void>> = {

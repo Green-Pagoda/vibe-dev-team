@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { BaseAgent } from '@vibe-dev-team/agent-core';
-import { PlaneClient } from '@vibe-dev-team/plane-client';
+import { BaseAgent, type AgentConfig } from '@vibe-dev-team/agent-core';
+import { PlaneClient, type PlaneIssueUpdate } from '@vibe-dev-team/plane-client';
 import { Mastra } from '@mastra/core';
 import { generateText } from '@vercel/ai';
 
@@ -32,20 +32,13 @@ export class FeatureEstimatorAgent extends BaseAgent {
   private planeClient: PlaneClient;
 
   constructor(mastra: Mastra, planeClient: PlaneClient) {
-    super(
-      {
-        name: 'Feature Estimator',
-        description: 'Estimates complexity and effort for new features',
-        version: '0.1.0',
-        capabilities: [
-          'Analyze feature requirements',
-          'Estimate complexity',
-          'Identify dependencies',
-          'Assess technical risks',
-        ],
-      },
-      mastra
-    );
+    const config: AgentConfig = {
+      name: 'Feature Estimator',
+      description: 'Estimates complexity and effort for new features',
+      version: '0.1.0',
+      capabilities: ['feature-estimation'],
+    };
+    super(config, mastra);
     this.planeClient = planeClient;
   }
 
@@ -127,10 +120,11 @@ Response format:
 
     // Update issue labels based on complexity
     const complexityLabel = `complexity:${estimation.complexity}`;
-    await this.planeClient.updateIssue(projectId, issueId, {
+    const updateData: PlaneIssueUpdate = {
       labels: [complexityLabel],
       estimate_point: this.complexityToPoints(estimation.complexity),
-    });
+    };
+    await this.planeClient.updateIssue(projectId, issueId, updateData);
   }
 
   private formatEstimationComment(estimation: FeatureEstimatorOutput): string {
@@ -156,14 +150,14 @@ ${estimation.risks.map(risk => `- ⚠️ ${risk}`).join('\n')}
 *Estimated by Feature Estimator Agent v0.1.0*`;
   }
 
-  private complexityToPoints(complexity: string): number {
-    const pointMap: Record<string, number> = {
+  private complexityToPoints(complexity: FeatureEstimatorOutput['complexity']): number {
+    const pointMap: Record<FeatureEstimatorOutput['complexity'], number> = {
       'trivial': 1,
       'small': 2,
       'medium': 3,
       'large': 5,
       'extra-large': 8,
     };
-    return pointMap[complexity] || 3;
+    return pointMap[complexity];
   }
 }
