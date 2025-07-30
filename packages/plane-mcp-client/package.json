@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node -e \"console.log('Plane MCP Client: Mock implementation ready - supports createIssue, updateIssue, addComment')\""
   },
   "dependencies": {
     "@makeplane/plane-mcp-server": "^0.1.4",

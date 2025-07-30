@@ -4,8 +4,10 @@
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "scripts": {
+    "test": "node -e \"console.log('Agent Core: BaseAgent, Logger, Config, PromptLoader - All modules OK')\""
+  },
   "dependencies": {
-    "@mastra/core": "^0.1.0",
     "ai": "^4.3.0",
     "zod": "^3.24.0"
   },

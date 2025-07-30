@@ -1,10 +1,5 @@
-import { Mastra } from '@mastra/core';
 import { FeatureEstimatorAgent } from './agent';
 import { PlaneMCPClient } from '@vibe-dev-team/plane-mcp-client';
-
-// Initialize Mastra with minimal config
-// TODO: Update to proper Mastra v0.12+ configuration when upgrading
-const mastra = new Mastra({} as any);
 
 // Initialize Plane client
 const planeClient = new PlaneMCPClient({
@@ -14,7 +9,7 @@ const planeClient = new PlaneMCPClient({
 });
 
 // Create agent instance
-const agent = new FeatureEstimatorAgent(mastra, planeClient);
+const agent = new FeatureEstimatorAgent(planeClient);
 
 // Start agent server
 const port = process.env['PORT'] || 8080;

@@ -1,4 +1,3 @@
-import { Mastra } from '@mastra/core';
 import { z } from 'zod';
 import type { AgentCapability, AgentResult, AgentError } from './types.js';
 
@@ -10,12 +9,10 @@ export interface AgentConfig {
 }
 
 export abstract class BaseAgent {
-  protected mastra: Mastra;
   protected config: AgentConfig;
 
-  constructor(config: AgentConfig, mastra: Mastra) {
+  constructor(config: AgentConfig) {
     this.config = config;
-    this.mastra = mastra;
   }
 
   abstract getInputSchema(): z.ZodSchema;

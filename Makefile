@@ -97,6 +97,14 @@ format: ## Format code with Prettier
 test: ## Run tests
 	@echo "TODO: Add test command"
 
+.PHONY: health
+health: ## Run full system health check (typecheck, format, lint)
+	npm run typecheck && npm run format:check && npm run lint
+
+.PHONY: demo
+demo: ## Run feature estimator demo
+	npm run demo:feature-estimator
+
 .PHONY: clean
 clean: ## Clean up generated files and containers
 	docker-compose down -v

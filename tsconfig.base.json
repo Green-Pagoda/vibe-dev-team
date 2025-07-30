@@ -17,8 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowJs": false,
-    "types": ["bun-types"],
-    "skipLibCheck": true, // Required due to broken dependency type definitions (Mastra @prisma-app/client, Next.js React types)
+    "types": ["node"],
+    "skipLibCheck": false,
     "paths": {
       "@vibe-dev-team/agent-core": ["./packages/agent-core/src"],
       "@vibe-dev-team/plane-mcp-client": ["./packages/plane-mcp-client/src"]

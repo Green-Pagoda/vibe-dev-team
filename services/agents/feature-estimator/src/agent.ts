@@ -10,7 +10,6 @@ import {
   PlaneMCPClient,
   type UpdateIssueInput,
 } from '@vibe-dev-team/plane-mcp-client';
-import { Mastra } from '@mastra/core';
 import { generateText } from 'ai';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -58,7 +57,7 @@ export class FeatureEstimatorAgent extends BaseAgent {
   private promptLoader = createPromptLoader(__dirname);
   private logger: Logger;
 
-  constructor(mastra: Mastra, planeClient: PlaneMCPClient) {
+  constructor(planeClient: PlaneMCPClient) {
     const config: AgentConfig = {
       name: AGENT_NAME,
       description:
@@ -66,7 +65,7 @@ export class FeatureEstimatorAgent extends BaseAgent {
       version: AGENT_VERSION,
       capabilities: ['feature-estimation'],
     };
-    super(config, mastra);
+    super(config);
     this.planeClient = planeClient;
     this.logger = createAgentLogger(AGENT_NAME, AGENT_VERSION);
   }
