@@ -9,7 +9,7 @@ export async function verifyPlaneWebhook(
   signature: string
 ): Promise<boolean> {
   const webhookSecret = process.env.PLANE_WEBHOOK_SECRET;
-  
+
   if (!webhookSecret) {
     console.error('PLANE_WEBHOOK_SECRET not configured');
     return false;

@@ -7,26 +7,31 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 ## Established Frameworks
 
 ### 1. **CrewAI** ⭐ 31.6k-34.7k stars
+
 **Status**: Highly active, production-ready
 **Focus**: Multi-agent orchestration with role-playing
 
 **Strengths**:
+
 - Lightning-fast Python framework built from scratch (not dependent on LangChain)
 - Over 100,000 developers certified through community courses
 - 4.2k+ forks indicating strong community engagement
 - Standardized examples and active ecosystem
 
 **Weaknesses**:
+
 - Relatively new, still establishing enterprise track record
 - Python-only currently
 
 **Best for**: Teams wanting autonomous agents that collaborate on complex tasks
 
 ### 2. **AutoGen (Microsoft)** ⭐ Not specified, but trending
+
 **Status**: Production-ready with enterprise backing
 **Focus**: Conversational agents with human-in-the-loop
 
 **Strengths**:
+
 - Complete v0.4 redesign in 2024 with async, event-driven architecture
 - Cross-language support (Python, .NET, more coming)
 - AutoGen Studio with 154,000+ downloads
@@ -34,22 +39,26 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Backed by Microsoft with mentions from Satya Nadella
 
 **Weaknesses**:
+
 - Complex architecture may be overkill for simple use cases
 - Breaking changes between versions
 
 **Best for**: Enterprise teams needing robust, scalable multi-agent systems
 
 ### 3. **OpenAI Swarm** → **OpenAI Agents SDK**
+
 **Status**: Educational → Production (via Agents SDK)
 **Focus**: Lightweight agent coordination
 
 **Strengths**:
+
 - Simple, elegant design philosophy
 - Minimal abstractions
 - Now evolved into production-ready Agents SDK
 - Built-in guardrails and session management in SDK
 
 **Weaknesses**:
+
 - Original Swarm not recommended for production
 - Limited to OpenAI models
 - Relatively new (2024 release)
@@ -57,10 +66,12 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 **Best for**: Teams already using OpenAI wanting official agent support
 
 ### 4. **Langroid** ⭐ Not specified
+
 **Status**: Production-ready
 **Focus**: Multi-agent conversations with Actor model
 
 **Strengths**:
+
 - First Python framework with agents as first-class citizens
 - Clean architecture praised by developers
 - Real healthcare production use (MALADE system)
@@ -68,16 +79,19 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Not built on LangChain
 
 **Weaknesses**:
+
 - Smaller community compared to major players
 - Less ecosystem/integrations
 
 **Best for**: Teams wanting clean architecture for conversational agents
 
 ### 5. **DSPy (Stanford)** ⭐ 16k+ stars
+
 **Status**: Research-grade moving to production
 **Focus**: Programmatic prompts instead of manual prompt engineering
 
 **Strengths**:
+
 - 160,000 monthly downloads
 - Strong academic backing (Stanford NLP)
 - Innovative approach to prompt optimization
@@ -85,6 +99,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Version 3.0 approaching
 
 **Weaknesses**:
+
 - Steeper learning curve
 - Different paradigm requires mindset shift
 - More research-oriented than production-focused
@@ -94,10 +109,12 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 ## Tool Integration Specialists
 
 ### 6. **Composio** ⭐ 12k+ developers building
+
 **Status**: Production-ready
 **Focus**: Integration platform for AI agents
 
 **Strengths**:
+
 - 100+ high-quality integrations
 - 40% higher accuracy in tool calls
 - Works with all major frameworks (OpenAI, Claude, LangChain, etc.)
@@ -105,6 +122,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - YourStory Tech30 2024 recognition
 
 **Weaknesses**:
+
 - Dependency on external services
 - Newer player (launched June 2023)
 
@@ -113,10 +131,12 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 ## Stateful & Workflow Frameworks
 
 ### 7. **Julep** ⭐ Not specified
+
 **Status**: Production-ready
 **Focus**: Stateful agents with persistent memory
 
 **Strengths**:
+
 - "Firebase for AI agents" approach
 - Built-in state management and persistence
 - Complex workflow support (YAML/code)
@@ -124,32 +144,38 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Enterprise features (private deployments)
 
 **Weaknesses**:
+
 - Less community visibility
 - Newer framework
 
 **Best for**: Teams building long-running, stateful AI workflows
 
 ### 8. **Burr** ⭐ Hosted under Apache
+
 **Status**: Production-ready
 **Focus**: AI application state machines
 
 **Strengths**:
+
 - Strong production features (telemetry, debugging, persistence)
 - Users report it's more robust than LangChain/CrewAI
 - Interactive debugging capabilities
 - PyData Global 2024 presentation
 
 **Weaknesses**:
+
 - Smaller community
 - Less documentation/examples
 
 **Best for**: Teams prioritizing debugging and monitoring in production
 
 ### 9. **Haystack** ⭐ Part of top RAG frameworks
+
 **Status**: Mature, production-ready
 **Focus**: RAG and pipeline-based systems
 
 **Strengths**:
+
 - Most stable option for production (per user reports)
 - Superior documentation vs LangChain
 - Best for retrieval-heavy applications
@@ -157,6 +183,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - deepset backing
 
 **Weaknesses**:
+
 - More focused on RAG than general agents
 - Less flexible for non-RAG use cases
 
@@ -165,39 +192,50 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 ## Emerging Frameworks (2024)
 
 ### 10. **Agno (formerly Phidata)** ⭐ 18.5k+ stars
+
 **Status**: Rapidly growing
 **Focus**: Multi-modal agents with memory and reasoning
 
 **Strengths**:
+
 - 5000x faster instantiation than LangGraph
 - 50x more memory efficient
 - Native multi-modal support (text, image, audio, video)
 - 5 levels of agent complexity
 
 **Weaknesses**:
+
 - Recent rebrand may cause confusion
 - Still establishing track record
 
 ### 11. **llama-agents**
+
 **Focus**: Async-first multi-agent systems
+
 - Distributed tool execution
 - Human-in-the-loop support
 
 ### 12. **agency-swarm**
+
 **Focus**: Built on OpenAI Assistants API
+
 - Reliable agent framework
 - OpenAI-specific
 
 ### 13. **Swarms Framework**
+
 **Focus**: Enterprise multi-agent orchestration
+
 - Used by RBC, John Deere
 - Bleeding-edge features
 
 ### 14. **Mastra** ⭐ 7.5k+ stars
+
 **Status**: Rapidly growing (went viral on HN/GitHub)
 **Focus**: TypeScript framework for AI apps
 
 **Strengths**:
+
 - TypeScript-first with excellent DX
 - Graph-based workflows with state machines
 - Built-in OpenTelemetry tracing
@@ -208,6 +246,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 - Quick setup (`npm create mastra@latest`)
 
 **Weaknesses**:
+
 - TypeScript-only (no Python support)
 - Newer framework (started Oct 2024)
 - Would fragment architecture if mixed with Python agents
@@ -215,6 +254,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 **Best for**: Greenfield TypeScript projects wanting modern agent framework
 
 ### 15. **Other Notable Mentions**:
+
 - **Modus**: Serverless agents in Go/AssemblyScript
 - **AgentDock**: Open-source agent deployment
 - **Voice Lab**: Voice agent testing framework
@@ -222,6 +262,7 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
 ## Key Insights & Recommendations
 
 ### Overall Trends:
+
 1. **Move away from monoliths**: Frameworks are becoming more modular and lightweight
 2. **Production focus**: 2024 saw shift from experimentation to production-readiness
 3. **Multi-modal emerging**: Support for images, audio, video becoming standard
@@ -254,12 +295,15 @@ The AI agent framework landscape has evolved significantly in 2024, with both es
    - Growing quickly
 
 ### Avoid for Production:
+
 - OpenAI Swarm (use Agents SDK instead)
 - Purely research frameworks
 - Anything with < 1k stars and no clear maintenance
 
 ### Migration Strategy:
+
 Most teams report success with:
+
 1. Start with simpler framework (CrewAI/Burr)
 2. Add Composio for integrations
 3. Migrate to more complex (AutoGen/Julep) only if needed

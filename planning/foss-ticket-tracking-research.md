@@ -15,6 +15,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 ## Top Recommendations
 
 ### 1. **Plane** (Best for Modern Development Teams)
+
 - **License**: Open source (Apache 2.0)
 - **API**: REST API with comprehensive documentation
 - **Webhooks**: Full webhook support with retry mechanism
@@ -28,6 +29,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - **Best For**: Teams wanting a modern, developer-friendly interface with strong automation capabilities
 
 ### 2. **GitLab Issues** (Best for Git-Integrated Workflows)
+
 - **License**: Open source (MIT for CE)
 - **API**: Extensive REST and GraphQL APIs
 - **Webhooks**: Comprehensive webhook event system
@@ -40,6 +42,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - **Best For**: Teams already using Git workflows who want integrated issue tracking
 
 ### 3. **GitHub Issues** (Best for Open Source Projects)
+
 - **License**: Proprietary platform, but issues are part of open repos
 - **API**: REST and GraphQL APIs
 - **Webhooks**: Enhanced in 2024 with project custom fields
@@ -51,6 +54,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - **Best For**: Open source projects or teams already on GitHub
 
 ### 4. **Taiga** (Best for Agile Teams)
+
 - **License**: Open source (AGPL)
 - **API**: REST API
 - **Webhooks**: Supported with integration platforms
@@ -62,6 +66,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - **Best For**: Agile development teams needing sprint planning
 
 ### 5. **Redmine** (Best for Customization)
+
 - **License**: Open source (GPL v2)
 - **API**: REST API
 - **Webhooks**: Via plugins
@@ -110,26 +115,28 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 
 ## API & Webhook Comparison
 
-| System | API Type | Authentication | Webhook Events | Real-time | Retry Logic |
-|--------|----------|----------------|----------------|-----------|-------------|
-| Plane | REST | API Key | Full lifecycle | Yes | Yes (exponential backoff) |
-| GitLab | REST/GraphQL | Token/OAuth | Comprehensive | Yes | Configurable |
-| GitHub | REST/GraphQL | Token/OAuth | Issues + Projects | Yes | Yes |
-| Taiga | REST | Token | Via integrations | Yes | Platform-dependent |
-| Redmine | REST | API Key | Via plugins | Depends | Plugin-dependent |
-| Zammad | REST | Token | Native support | Yes | Yes |
+| System  | API Type     | Authentication | Webhook Events    | Real-time | Retry Logic               |
+| ------- | ------------ | -------------- | ----------------- | --------- | ------------------------- |
+| Plane   | REST         | API Key        | Full lifecycle    | Yes       | Yes (exponential backoff) |
+| GitLab  | REST/GraphQL | Token/OAuth    | Comprehensive     | Yes       | Configurable              |
+| GitHub  | REST/GraphQL | Token/OAuth    | Issues + Projects | Yes       | Yes                       |
+| Taiga   | REST         | Token          | Via integrations  | Yes       | Platform-dependent        |
+| Redmine | REST         | API Key        | Via plugins       | Depends   | Plugin-dependent          |
+| Zammad  | REST         | Token          | Native support    | Yes       | Yes                       |
 
 ## Recommendations by Use Case
 
 ### For Agentic AI Development Teams
 
 **Primary Recommendation: Plane**
+
 - Modern architecture designed for API-first usage
 - Comprehensive webhook support with security
 - Active development and community
 - Clean API design suitable for AI agents
 
 **Secondary Recommendation: GitLab (self-hosted)**
+
 - Complete DevOps integration
 - Extensive API coverage
 - Strong webhook system
@@ -146,6 +153,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 ## Technical Integration Considerations
 
 ### API Endpoints Typically Available
+
 - Issues: Create, read, update, delete, search
 - Comments: Add, edit, delete
 - Users: Assign, mention, permissions
@@ -155,6 +163,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - Time tracking: Log, report
 
 ### Webhook Event Types
+
 - Issue created/updated/closed
 - Comment added/edited
 - Assignment changes
@@ -163,6 +172,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 - Project modifications
 
 ### Authentication Methods
+
 - API Keys (Plane, Redmine)
 - OAuth 2.0 (GitHub, GitLab)
 - Personal Access Tokens (most systems)
@@ -173,6 +183,7 @@ This research covers modern FOSS (Free and Open Source Software) ticket tracking
 For an agentic AI development team, **Plane** offers the best combination of modern architecture, comprehensive API/webhook support, and active development. However, if you're already invested in a Git-based workflow, **GitLab** provides excellent integration with development processes while maintaining strong programmatic access capabilities.
 
 The choice ultimately depends on your specific needs:
+
 - Choose **Plane** for a modern, API-first experience
 - Choose **GitLab/GitHub** for integrated Git workflows
 - Choose **Redmine** for maximum customization

@@ -1,6 +1,6 @@
 /**
  * Plane MCP Client Wrapper
- * 
+ *
  * This module provides a TypeScript wrapper around the official @makeplane/plane-mcp-server
  * It offers type-safe interfaces for interacting with Plane's API through MCP.
  */
@@ -69,7 +69,7 @@ export type UpdateIssueInput = z.infer<typeof UpdateIssueSchema>;
 
 /**
  * Plane MCP Client
- * 
+ *
  * Wraps the official Plane MCP server for type-safe programmatic access.
  * This class provides a clean interface to Plane's project management features.
  */
@@ -78,7 +78,7 @@ export class PlaneMCPClient {
 
   constructor(config: PlaneMCPConfig) {
     this.config = config;
-    
+
     // Set environment variables for the MCP server
     process.env.PLANE_API_KEY = config.apiKey;
     process.env.PLANE_WORKSPACE_SLUG = config.workspaceSlug;
@@ -90,7 +90,10 @@ export class PlaneMCPClient {
   /**
    * Create a new issue in the specified project
    */
-  async createIssue(projectId: string, data: CreateIssueInput): Promise<PlaneIssue> {
+  async createIssue(
+    projectId: string,
+    data: CreateIssueInput
+  ): Promise<PlaneIssue> {
     // TODO: Integrate with actual MCP server once workspace issues are resolved
     // For now, return a mock implementation
     const issue: PlaneIssue = {
@@ -106,18 +109,27 @@ export class PlaneMCPClient {
       project: projectId,
       workspace: this.config.workspaceSlug,
     };
-    
-    console.log(`[PlaneMCPClient] Created issue: ${issue.name} (ID: ${issue.id})`);
+
+    console.log(
+      `[PlaneMCPClient] Created issue: ${issue.name} (ID: ${issue.id})`
+    );
     return issue;
   }
 
   /**
    * Update an existing issue
    */
-  async updateIssue(projectId: string, issueId: string, data: UpdateIssueInput): Promise<PlaneIssue> {
+  async updateIssue(
+    projectId: string,
+    issueId: string,
+    data: UpdateIssueInput
+  ): Promise<PlaneIssue> {
     // TODO: Integrate with actual MCP server
-    console.log(`[PlaneMCPClient] Updated issue ${issueId} in project ${projectId}`, data);
-    
+    console.log(
+      `[PlaneMCPClient] Updated issue ${issueId} in project ${projectId}`,
+      data
+    );
+
     // Mock implementation - in reality this would call the MCP server
     const updatedIssue: PlaneIssue = {
       id: issueId,
@@ -132,17 +144,23 @@ export class PlaneMCPClient {
       project: projectId,
       workspace: this.config.workspaceSlug,
     };
-    
+
     return updatedIssue;
   }
 
   /**
    * Add a comment to an issue
    */
-  async addComment(projectId: string, issueId: string, comment: string): Promise<PlaneComment> {
+  async addComment(
+    projectId: string,
+    issueId: string,
+    comment: string
+  ): Promise<PlaneComment> {
     // TODO: Integrate with actual MCP server
-    console.log(`[PlaneMCPClient] Added comment to issue ${issueId}: ${comment.substring(0, 100)}...`);
-    
+    console.log(
+      `[PlaneMCPClient] Added comment to issue ${issueId}: ${comment.substring(0, 100)}...`
+    );
+
     const newComment: PlaneComment = {
       id: `comment-${Date.now()}`,
       comment,
@@ -151,7 +169,7 @@ export class PlaneMCPClient {
       actor: 'feature-estimator-agent',
       issue: issueId,
     };
-    
+
     return newComment;
   }
 
@@ -160,8 +178,10 @@ export class PlaneMCPClient {
    */
   async getIssue(projectId: string, issueId: string): Promise<PlaneIssue> {
     // TODO: Integrate with actual MCP server
-    console.log(`[PlaneMCPClient] Retrieved issue ${issueId} from project ${projectId}`);
-    
+    console.log(
+      `[PlaneMCPClient] Retrieved issue ${issueId} from project ${projectId}`
+    );
+
     const issue: PlaneIssue = {
       id: issueId,
       name: 'Mock Issue',
@@ -175,7 +195,7 @@ export class PlaneMCPClient {
       project: projectId,
       workspace: this.config.workspaceSlug,
     };
-    
+
     return issue;
   }
 
@@ -184,8 +204,10 @@ export class PlaneMCPClient {
    */
   async getProjects(): Promise<PlaneProject[]> {
     // TODO: Integrate with actual MCP server
-    console.log(`[PlaneMCPClient] Retrieved projects for workspace ${this.config.workspaceSlug}`);
-    
+    console.log(
+      `[PlaneMCPClient] Retrieved projects for workspace ${this.config.workspaceSlug}`
+    );
+
     return [
       {
         id: 'project-1',

@@ -22,7 +22,7 @@ webhookRouter.post('/plane', async (c) => {
     // Verify webhook signature
     const signature = c.req.header('X-Plane-Signature');
     const body = await c.req.text();
-    
+
     if (!signature) {
       throw new HTTPException(401, { message: 'Missing webhook signature' });
     }
@@ -37,7 +37,9 @@ webhookRouter.post('/plane', async (c) => {
     const validatedPayload = PlaneWebhookSchema.parse(payload);
 
     // Log the event
-    console.log(`Received Plane webhook: ${validatedPayload.event}.${validatedPayload.action}`);
+    console.log(
+      `Received Plane webhook: ${validatedPayload.event}.${validatedPayload.action}`
+    );
 
     // Handle the event asynchronously
     handlePlaneEvent(validatedPayload).catch(console.error);

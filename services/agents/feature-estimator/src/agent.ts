@@ -1,8 +1,17 @@
 import { z } from 'zod';
-import { BaseAgent, type AgentConfig, createPromptLoader, createAgentLogger, type Logger } from '@vibe-dev-team/agent-core';
-import { PlaneMCPClient, type UpdateIssueInput } from '@vibe-dev-team/plane-mcp-client';
+import {
+  BaseAgent,
+  type AgentConfig,
+  createPromptLoader,
+  createAgentLogger,
+  type Logger,
+} from '@vibe-dev-team/agent-core';
+import {
+  PlaneMCPClient,
+  type UpdateIssueInput,
+} from '@vibe-dev-team/plane-mcp-client';
 import { Mastra } from '@mastra/core';
-import { generateText } from '@vercel/ai';
+import { generateText } from 'ai';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -34,10 +43,10 @@ type FeatureEstimatorOutput = z.infer<typeof FeatureEstimatorOutputSchema>;
 
 // Constants
 const COMPLEXITY_POINTS = {
-  'trivial': 1,
-  'small': 2,
-  'medium': 3,
-  'large': 5,
+  trivial: 1,
+  small: 2,
+  medium: 3,
+  large: 5,
   'extra-large': 8,
 } as const;
 
@@ -52,7 +61,8 @@ export class FeatureEstimatorAgent extends BaseAgent {
   constructor(mastra: Mastra, planeClient: PlaneMCPClient) {
     const config: AgentConfig = {
       name: AGENT_NAME,
-      description: 'Estimates complexity and effort for new features using official Plane MCP integration',
+      description:
+        'Estimates complexity and effort for new features using official Plane MCP integration',
       version: AGENT_VERSION,
       capabilities: ['feature-estimation'],
     };
@@ -71,23 +81,32 @@ export class FeatureEstimatorAgent extends BaseAgent {
 
   async execute(input: FeatureEstimatorInput): Promise<FeatureEstimatorOutput> {
     const executionId = `${input.issueId}-${Date.now()}`;
-    const logger = this.logger.child({ executionId, projectId: input.projectId, issueId: input.issueId });
-    
+    const logger = this.logger.child({
+      executionId,
+      projectId: input.projectId,
+      issueId: input.issueId,
+    });
+
     logger.info('Starting feature estimation', { title: input.title });
-    
+
     const prompt = this.buildEstimationPrompt(input);
     const response = await this.generateLLMEstimation(prompt);
     const estimation = this.parseAndValidateResponse(response.text);
-    
-    logger.info('Estimation completed', { 
-      complexity: estimation.complexity, 
+
+    logger.info('Estimation completed', {
+      complexity: estimation.complexity,
       estimatedHours: estimation.estimatedHours,
-      confidence: estimation.confidence 
+      confidence: estimation.confidence,
     });
-    
+
     // Update Plane issue with estimation (non-blocking)
-    this.updatePlaneIssueAsync(input.projectId, input.issueId, estimation, logger);
-    
+    this.updatePlaneIssueAsync(
+      input.projectId,
+      input.issueId,
+      estimation,
+      logger
+    );
+
     return estimation;
   }
 
@@ -103,7 +122,9 @@ export class FeatureEstimatorAgent extends BaseAgent {
     return this.promptLoader.getSystemPrompt();
   }
 
-  private parseAndValidateResponse(responseText: string): FeatureEstimatorOutput {
+  private parseAndValidateResponse(
+    responseText: string
+  ): FeatureEstimatorOutput {
     // Parse JSON response
     let parsedResponse: unknown;
     try {
@@ -112,7 +133,13 @@ export class FeatureEstimatorAgent extends BaseAgent {
       throw this.createError(
         'LLM_RESPONSE_INVALID_JSON',
         'LLM response is not valid JSON',
-        { response: responseText, parseError: parseError instanceof Error ? parseError.message : String(parseError) }
+        {
+          response: responseText,
+          parseError:
+            parseError instanceof Error
+              ? parseError.message
+              : String(parseError),
+        }
       );
     }
 
@@ -130,8 +157,8 @@ export class FeatureEstimatorAgent extends BaseAgent {
   }
 
   private async updatePlaneIssueAsync(
-    projectId: string, 
-    issueId: string, 
+    projectId: string,
+    issueId: string,
     estimation: FeatureEstimatorOutput,
     logger: Logger
   ): Promise<void> {
@@ -139,14 +166,19 @@ export class FeatureEstimatorAgent extends BaseAgent {
       await this.updatePlaneIssue(projectId, issueId, estimation);
       logger.info('Successfully updated Plane issue');
     } catch (error) {
-      logger.error('Failed to update Plane issue (non-blocking)', error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to update Plane issue (non-blocking)',
+        error instanceof Error ? error : new Error(String(error))
+      );
     }
   }
 
   private buildEstimationPrompt(input: FeatureEstimatorInput): string {
     const title = this.sanitizeInput(input.title);
     const description = this.sanitizeInput(input.description);
-    const labels = input.labels?.map(label => this.sanitizeInput(label)).join(', ') || 'None';
+    const labels =
+      input.labels?.map((label) => this.sanitizeInput(label)).join(', ') ||
+      'None';
 
     return this.promptLoader.processPrompt('estimation.md', {
       title,
@@ -193,19 +225,21 @@ export class FeatureEstimatorAgent extends BaseAgent {
 ${estimation.reasoning}
 
 ### Technical Considerations
-${estimation.technicalConsiderations.map(tc => `- ${tc}`).join('\n')}
+${estimation.technicalConsiderations.map((tc) => `- ${tc}`).join('\n')}
 
 ### Dependencies
-${estimation.dependencies.map(dep => `- ${dep}`).join('\n')}
+${estimation.dependencies.map((dep) => `- ${dep}`).join('\n')}
 
 ### Risks
-${estimation.risks.map(risk => `- ⚠️ ${risk}`).join('\n')}
+${estimation.risks.map((risk) => `- ⚠️ ${risk}`).join('\n')}
 
 ---
 *Estimated by ${AGENT_NAME} v${AGENT_VERSION}*`;
   }
 
-  private complexityToPoints(complexity: FeatureEstimatorOutput['complexity']): number {
+  private complexityToPoints(
+    complexity: FeatureEstimatorOutput['complexity']
+  ): number {
     return COMPLEXITY_POINTS[complexity];
   }
 }

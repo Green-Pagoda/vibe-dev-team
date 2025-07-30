@@ -1,6 +1,6 @@
 /**
  * Prompt loading utility for agents
- * 
+ *
  * Loads and processes prompt templates from markdown files,
  * enabling easy editing by human developers.
  */
@@ -27,7 +27,9 @@ export class PromptLoader {
     try {
       return readFileSync(filepath, 'utf-8');
     } catch (error) {
-      throw new Error(`Failed to load prompt file: ${filepath}. ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to load prompt file: ${filepath}. ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -42,11 +44,16 @@ export class PromptLoader {
   /**
    * Substitute {{variable}} placeholders in template
    */
-  private substituteVariables(template: string, variables: PromptVariables): string {
+  private substituteVariables(
+    template: string,
+    variables: PromptVariables
+  ): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, variableName) => {
       const value = variables[variableName];
       if (value === undefined) {
-        console.warn(`Prompt variable '${variableName}' not provided, leaving placeholder`);
+        console.warn(
+          `Prompt variable '${variableName}' not provided, leaving placeholder`
+        );
         return match;
       }
       return value;

@@ -45,6 +45,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 ## Component Details
 
 ### 1. Webhook Server (Hono/Bun)
+
 - **Purpose**: Receives events from Plane ticket system
 - **Responsibilities**:
   - Validate webhook signatures
@@ -53,7 +54,9 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
   - Return acknowledgment to Plane
 
 ### 2. Workflow Orchestration
+
 #### Phase 1: Mastra vNext Workflows
+
 - **Purpose**: Lightweight agent coordination
 - **Responsibilities**:
   - Coordinate agent execution order
@@ -62,24 +65,27 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
   - Enforce quality gates between stages
 
 #### Phase 2: Temporal Integration (Future)
+
 - **Purpose**: Durable, long-running workflows
 - **Migration**: When Mastra ships Temporal backend support
 - **Benefits**: Full durability, event sourcing, proven reliability
 
 ### 3. Agent Workers
+
 - **Purpose**: Specialized task execution
 - **Structure**: Each agent type runs as separate worker pool
 - **Communication**: Only through Plane API (no direct agent-to-agent)
 - **State**: Stateless - all context from tickets
 
 #### Mastra Agent Framework
+
 - **Purpose**: Provides role-based agent execution foundation
 - **Responsibilities**:
   - Define agent roles with specific capabilities and tools
   - Handle LLM interactions through standardized interfaces
   - Execute agent tasks with consistent error handling
   - Provide memory and context management per agent
-- **Integration**: 
+- **Integration**:
   - Receives tasks from Mastra workflows
   - Uses Plane API client for ticket operations
   - Leverages Vercel AI SDK for provider-agnostic LLM access
@@ -94,22 +100,26 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 ### 4. External Integrations
 
 #### Plane API Client
+
 - Create, update, comment on tickets
 - Query ticket state and history
 - Manage labels and assignments
 
 #### Vercel AI SDK
+
 - Unified interface to all LLM providers
 - Model selection per agent role
 - Cost tracking and rate limiting
 - Fallback handling
 
 #### Git Abstraction Layer
+
 - Provider-agnostic Git operations
 - Support for GitHub, GitLab, etc.
 - Commit, branch, PR management
 
 #### MCP Server Integration
+
 - **Purpose**: Standardized protocol for agent-tool communication
 - **Architecture**: Client-server model with secure OAuth 2.1 authentication
 - **Capabilities**:
@@ -136,7 +146,7 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
    ├─→ Analyzes complexity using specialized tools
    └─→ Updates ticket with structured estimate
    │
-5. Mastra Requirements Decomposer Agent  
+5. Mastra Requirements Decomposer Agent
    ├─→ Reads estimated ticket
    ├─→ Creates subtask tickets with clear acceptance criteria
    └─→ Links subtasks to parent via Plane API
@@ -156,34 +166,36 @@ The AI Dev Team system consists of specialized agents that communicate exclusive
 ## Deployment Architecture
 
 ### Development
+
 ```yaml
 # docker-compose.yml
 services:
   plane:
     image: makeplane/plane
-  
+
   # temporal: # Phase 2 - when Mastra supports Temporal backend
   #   image: temporalio/server
-  
+
   webhook-server:
     build: ./webhook
     runtime: bun
-    
+
   mcp-dev-tools:
     build: ./mcp-servers
     ports:
-      - "3001:3001"  # MCP server for development tools
-    
+      - '3001:3001' # MCP server for development tools
+
   agent-estimator:
     build: ./agents
     environment:
       - AGENT_TYPE=estimator
       - MCP_DEV_TOOLS_URL=http://mcp-dev-tools:3001
-      
+
   # ... more agents
 ```
 
 ### Production
+
 - **Kubernetes**: For container orchestration
 - **Separate namespaces**: Per agent type
 - **Horizontal scaling**: Based on ticket volume
@@ -209,12 +221,14 @@ services:
 ## MCP Integration Strategy
 
 ### Protocol Benefits
+
 - **Standardization**: Universal interface for agent-tool communication
 - **Security**: OAuth 2.1 authentication and permission-based access control
 - **Real-time**: Streamable HTTP transport for bi-directional communication
 - **Ecosystem**: Compatible with OpenAI and Google's 2025 MCP adoption
 
 ### Implementation Approach
+
 - **MCP Servers**: Containerized services exposing development tools (ruff, mypy, git)
 - **Agent Clients**: Each CrewAI agent configured as MCP client with role-specific permissions
 - **Tool Categories**:
@@ -223,6 +237,7 @@ services:
   - **Prompts**: Specialized user-invoked interactions
 
 ### Migration Path
+
 1. **Phase 1**: Deploy MCP servers alongside existing CLI wrappers
 2. **Phase 2**: Migrate agents to MCP clients incrementally
 3. **Phase 3**: Deprecate custom CLI interface in favor of MCP standard

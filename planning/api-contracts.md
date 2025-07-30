@@ -1,20 +1,24 @@
 # API Contracts
 
 ## Overview
+
 This document defines the API contracts between system components, ensuring type-safe communication.
 
 ## 1. Webhook Server API
 
 ### POST /webhook/plane
+
 Receives events from Plane ticket system.
 
 **Request Headers:**
+
 ```
 X-Plane-Signature: <webhook_signature>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```python
 from typing import Literal, Optional
 from datetime import datetime
@@ -23,7 +27,7 @@ from pydantic import BaseModel
 class PlaneWebhookEvent(BaseModel):
     event_type: Literal[
         "issue.created",
-        "issue.updated", 
+        "issue.updated",
         "issue.deleted",
         "issue.comment.created",
         "issue.assignee.updated",
@@ -53,6 +57,7 @@ class ActorData(BaseModel):
 ```
 
 **Response:**
+
 ```python
 class WebhookResponse(BaseModel):
     status: Literal["accepted", "rejected"]
@@ -69,27 +74,27 @@ class PlaneClient(ABC):
     @abstractmethod
     async def get_issue(self, issue_id: str) -> IssueData:
         """Fetch issue details."""
-        
+
     @abstractmethod
     async def update_issue(
-        self, 
-        issue_id: str, 
+        self,
+        issue_id: str,
         updates: IssueUpdate
     ) -> IssueData:
         """Update issue fields."""
-        
+
     @abstractmethod
     async def create_issue(
-        self, 
+        self,
         project_id: str,
         issue: IssueCreate
     ) -> IssueData:
         """Create new issue."""
-        
+
     @abstractmethod
     async def add_comment(
-        self, 
-        issue_id: str, 
+        self,
+        issue_id: str,
         comment: str
     ) -> CommentData:
         """Add comment to issue."""
@@ -120,17 +125,17 @@ T = TypeVar('T', bound='AgentResult')
 
 class Agent(Protocol[T]):
     """Base protocol all agents must implement."""
-    
+
     @property
     def agent_type(self) -> str:
         """Unique agent type identifier."""
-        
+
     @property
     def model_config(self) -> ModelConfig:
         """LLM configuration for this agent."""
-        
+
     async def process_ticket(
-        self, 
+        self,
         ticket: IssueData,
         context: AgentContext
     ) -> T:
@@ -199,12 +204,12 @@ class TicketWorkflow:
     async def run(self, ticket_id: str) -> WorkflowResult:
         """Main ticket processing workflow."""
 
-@workflow.defn  
+@workflow.defn
 class CodeReviewWorkflow:
     @workflow.run
     async def run(
-        self, 
-        pr_url: str, 
+        self,
+        pr_url: str,
         ticket_id: str
     ) -> ReviewResult:
         """Code review sub-workflow."""
@@ -290,12 +295,12 @@ class TokenUsage:
 ```python
 class GitProvider(Protocol):
     async def create_branch(
-        self, 
-        branch_name: str, 
+        self,
+        branch_name: str,
         from_branch: str = "main"
     ) -> str:
         """Create new branch."""
-        
+
     async def commit(
         self,
         branch: str,
@@ -303,7 +308,7 @@ class GitProvider(Protocol):
         files: dict[str, str]  # path -> content
     ) -> str:
         """Commit files with message."""
-        
+
     async def create_pr(
         self,
         title: str,
@@ -328,17 +333,17 @@ All APIs should raise typed exceptions:
 ```python
 class PlaneAPIError(Exception):
     """Base exception for Plane API errors."""
-    
+
 class WebhookValidationError(PlaneAPIError):
     """Invalid webhook signature or payload."""
-    
+
 class TicketNotFoundError(PlaneAPIError):
     """Requested ticket does not exist."""
-    
+
 class RateLimitError(PlaneAPIError):
     """API rate limit exceeded."""
     retry_after: int  # seconds
-    
+
 class AgentExecutionError(Exception):
     """Agent failed to process ticket."""
     agent_type: str

@@ -1,11 +1,13 @@
 # Type Safety Strategy
 
 ## Philosophy
+
 Maximum compile-time type safety with zero runtime overhead. Native TypeScript strict mode throughout the entire codebase.
 
 ## Core Approach
 
 ### 1. TypeScript Strict Mode Throughout
+
 ```
 src/
 ├── agents/           # Mastra agent definitions
@@ -18,11 +20,13 @@ src/
 ### 2. Type Checking Stack
 
 **Compile-Time Checking**:
+
 - **TypeScript** with strict mode enabled
 - **Bun** for fast type checking and runtime
 - Type errors = build failures
 
 **Additional Tooling**:
+
 - **@typescript-eslint** for additional type-aware linting
 - **tsc --noEmit** in CI for pure type checking
 - **Zod** for runtime validation at API boundaries
@@ -30,7 +34,8 @@ src/
 ## Configuration
 
 ### tsconfig.json
-```json
+
+````json
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -103,11 +108,12 @@ src/
     "@typescript-eslint/strict-boolean-expressions": "error"
   }
 }
-```
+````
 
 ## CI Pipeline
 
 ### GitHub Actions Workflow
+
 ```yaml
 name: Type Safety Enforcement
 on: [push, pull_request]
@@ -117,23 +123,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-          
+
       - name: Install dependencies
         run: bun install
-          
+
       - name: Type check with TypeScript
         run: bun run type-check
-        
+
       - name: Lint with type-aware rules
         run: bun run lint
-        
+
       - name: Build project
         run: bun run build
-        
+
       - name: Run tests
         run: bun test
 ```
@@ -141,6 +147,7 @@ jobs:
 ## Development Workflow
 
 ### Local Development
+
 ```bash
 # Start development with hot reload
 bun run dev
@@ -152,7 +159,8 @@ bun test
 ```
 
 ### package.json Scripts
-```json
+
+````json
 {
   "scripts": {
     "dev": "bun run --hot src/index.ts",
@@ -221,10 +229,10 @@ function handleStatus(status: Status): string {
 }
 
 // Result type for explicit error handling
-type Result<T, E = Error> = 
+type Result<T, E = Error> =
   | { ok: true; value: T }
   | { ok: false; error: E };
-```
+````
 
 ## Benefits
 
@@ -237,6 +245,7 @@ type Result<T, E = Error> =
 ## Runtime Validation
 
 Use Zod schemas at boundaries:
+
 - API request/response validation
 - External system integration
 - LLM response parsing

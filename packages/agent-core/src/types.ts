@@ -26,7 +26,7 @@ export interface AgentMessage {
   timestamp: Date;
 }
 
-export type AgentCapability = 
+export type AgentCapability =
   | 'feature-estimation'
   | 'requirements-analysis'
   | 'code-review'

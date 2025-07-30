@@ -1,6 +1,6 @@
 /**
  * Configuration management for agents
- * 
+ *
  * Provides type-safe configuration loading with validation
  * and environment variable support.
  */
@@ -15,7 +15,7 @@ export const BaseConfigSchema = z.object({
     workspaceSlug: z.string().min(1, 'Plane workspace slug is required'),
     apiHostUrl: z.string().url().optional(),
   }),
-  
+
   // LLM configuration
   llm: z.object({
     provider: z.enum(['openai', 'anthropic', 'local']).default('openai'),
@@ -23,7 +23,7 @@ export const BaseConfigSchema = z.object({
     temperature: z.number().min(0).max(2).default(0.7),
     maxTokens: z.number().positive().default(2000),
   }),
-  
+
   // Agent behavior
   agent: z.object({
     timeout: z.number().positive().default(30000), // 30 seconds
@@ -40,7 +40,10 @@ export interface ConfigOptions {
 }
 
 export class ConfigError extends Error {
-  constructor(message: string, public validationErrors?: z.ZodError) {
+  constructor(
+    message: string,
+    public validationErrors?: z.ZodError
+  ) {
     super(message);
     this.name = 'ConfigError';
   }
@@ -105,17 +108,14 @@ export class ConfigLoader<T extends BaseConfig = BaseConfig> {
   private validateConfig(config: unknown): T {
     const result = this.schema.safeParse(config);
     if (!result.success) {
-      throw new ConfigError(
-        'Configuration validation failed',
-        result.error
-      );
+      throw new ConfigError('Configuration validation failed', result.error);
     }
     return result.data;
   }
 
   private deepMerge(target: any, source: any): any {
     const result = { ...target };
-    
+
     for (const key in source) {
       if (source[key] !== undefined && source[key] !== null) {
         if (typeof source[key] === 'object' && !Array.isArray(source[key])) {
@@ -125,7 +125,7 @@ export class ConfigLoader<T extends BaseConfig = BaseConfig> {
         }
       }
     }
-    
+
     return result;
   }
 }

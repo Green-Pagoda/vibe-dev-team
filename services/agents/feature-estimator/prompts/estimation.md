@@ -29,13 +29,10 @@ Analyze this feature request and provide:
     "Database schema changes needed",
     "API endpoint modifications required"
   ],
-  "dependencies": [
-    "User authentication system",
-    "Email notification service"
-  ],
+  "dependencies": ["User authentication system", "Email notification service"],
   "risks": [
     "Third-party API integration may be unstable",
     "Performance impact on large datasets"
-  ] 
+  ]
 }
 ```

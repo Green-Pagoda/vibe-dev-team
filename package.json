@@ -5,22 +5,29 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "services/*",
+    "services/plane-event-dispatcher",
     "services/agents/*"
   ],
   "scripts": {
     "dev": "docker-compose up",
     "build": "docker-compose build",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write '**/*.{ts,tsx,json,md}'"
+    "typecheck": "npx tsc --noEmit",
+    "lint": "npx eslint . --ext .ts,.tsx",
+    "lint:fix": "npx eslint . --ext .ts,.tsx --fix",
+    "format": "npx prettier --write '**/*.{ts,tsx,json,md}'",
+    "format:check": "npx prettier --check '**/*.{ts,tsx,json,md}'",
+    "install:all": "npm install --workspaces --include-workspace-root",
+    "install:workspaces": "npm install --workspaces",
+    "clean": "rm -rf node_modules packages/*/node_modules services/*/node_modules services/agents/*/node_modules"
   },
   "devDependencies": {
     "@types/bun": "^1.1.0",
+    "@types/node": "^20.0.0",
     "typescript": "^5.7.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
     "prettier": "^3.4.0"
   }
 }

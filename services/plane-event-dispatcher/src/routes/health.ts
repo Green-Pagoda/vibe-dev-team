@@ -15,7 +15,7 @@ healthRouter.get('/ready', (c) => {
   // TODO: Check dependencies (Plane API, Mastra, etc.)
   const checks = {
     plane_api: true, // TODO: Implement actual health check
-    mastra: true,    // TODO: Implement actual health check
+    mastra: true, // TODO: Implement actual health check
   };
 
   const allHealthy = Object.values(checks).every((status) => status);

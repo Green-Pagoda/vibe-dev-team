@@ -36,6 +36,7 @@ vibe-dev-team/
 ### Environment Setup
 
 1. Copy `.env.example` to `.env`:
+
    ```bash
    cp .env.example .env
    ```
@@ -82,12 +83,14 @@ make format            # Format code with Prettier
 ## Agent Capabilities
 
 ### Feature Estimator
+
 - Analyzes new feature requests
 - Estimates complexity (trivial to extra-large)
 - Identifies dependencies and risks
 - Updates Plane tickets with structured estimates
 
 ### Coming Soon
+
 - Requirements Decomposer
 - Architecture Decision Maker
 - Code Style Enforcer

@@ -1,6 +1,6 @@
 /**
  * Structured logging utility for agents
- * 
+ *
  * Provides consistent, structured logging across all agents with context
  * and proper log levels. Uses JSON format for better observability.
  */
@@ -72,7 +72,11 @@ export class Logger {
     console.error(JSON.stringify(logEntry));
   }
 
-  private log(level: LogLevel, message: string, additionalContext?: LogContext): void {
+  private log(
+    level: LogLevel,
+    message: string,
+    additionalContext?: LogContext
+  ): void {
     const logEntry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
@@ -81,9 +85,12 @@ export class Logger {
     };
 
     // Use appropriate console method based on level
-    const consoleMethod = level === LogLevel.ERROR ? console.error :
-                         level === LogLevel.WARN ? console.warn :
-                         console.log;
+    const consoleMethod =
+      level === LogLevel.ERROR
+        ? console.error
+        : level === LogLevel.WARN
+          ? console.warn
+          : console.log;
 
     consoleMethod(JSON.stringify(logEntry));
   }
@@ -95,7 +102,10 @@ export class Logger {
 }
 
 // Factory function for creating agent loggers
-export function createAgentLogger(agentName: string, agentVersion: string): Logger {
+export function createAgentLogger(
+  agentName: string,
+  agentVersion: string
+): Logger {
   return new Logger({
     agentName,
     agentVersion,

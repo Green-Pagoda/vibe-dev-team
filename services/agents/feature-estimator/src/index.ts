@@ -1,28 +1,24 @@
 import { Mastra } from '@mastra/core';
-import { openai } from '@vercel/ai';
 import { FeatureEstimatorAgent } from './agent';
-import { PlaneClient } from '@vibe-dev-team/plane-client';
+import { PlaneMCPClient } from '@vibe-dev-team/plane-mcp-client';
 
 // Initialize Mastra
 const mastra = new Mastra({
-  llm: {
-    provider: openai,
-    model: 'gpt-4',
-  },
+  // TODO: Configure properly with Mastra's expected structure
 });
 
 // Initialize Plane client
-const planeClient = new PlaneClient({
-  apiUrl: process.env.PLANE_API_URL!,
-  apiKey: process.env.PLANE_API_KEY!,
-  workspaceSlug: process.env.PLANE_WORKSPACE_SLUG!,
+const planeClient = new PlaneMCPClient({
+  apiKey: process.env['PLANE_API_KEY'] || '',
+  workspaceSlug: process.env['PLANE_WORKSPACE_SLUG'] || '',
+  apiHostUrl: process.env['PLANE_API_HOST_URL'],
 });
 
 // Create agent instance
 const agent = new FeatureEstimatorAgent(mastra, planeClient);
 
 // Start agent server
-const port = process.env.PORT || 8080;
+const port = process.env['PORT'] || 8080;
 
 console.log(`Feature Estimator Agent starting on port ${port}...`);
 

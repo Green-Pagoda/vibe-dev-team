@@ -1,6 +1,7 @@
 # FOSS Ticket Tracking Solutions Analysis
 
 ## Requirements
+
 - **FOSS**: Open source and self-hostable
 - **Strong API**: Programmatic ticket creation, assignment, commenting
 - **Webhooks**: Real-time event notifications for agents
@@ -10,6 +11,7 @@
 ## Top Recommendations
 
 ### 1. Plane (Recommended)
+
 **Why**: Purpose-built for modern API-first workflows
 
 - **License**: Apache 2.0
@@ -22,7 +24,8 @@
 
 **Ideal for**: Our use case - designed for programmatic interaction
 
-### 2. GitLab Issues  
+### 2. GitLab Issues
+
 **Why**: Tight Git integration, mature API
 
 - **License**: MIT (CE edition)
@@ -35,6 +38,7 @@
 **Ideal for**: Teams wanting Git integration
 
 ### 3. GitHub Issues
+
 **Why**: Ecosystem and 2024 enhancements
 
 - **License**: Not self-hostable (GitHub Enterprise is paid)
@@ -47,6 +51,7 @@
 **Note**: Not truly FOSS for self-hosting
 
 ### 4. Taiga
+
 **Why**: Agile-focused with good APIs
 
 - **License**: AGPL
@@ -59,6 +64,7 @@
 **Ideal for**: Scrum/Kanban workflows
 
 ### 5. Redmine
+
 **Why**: Mature, highly customizable
 
 - **License**: GPL v2
@@ -73,17 +79,20 @@
 ## Other Options Considered
 
 ### OpenProject
+
 - Strong project management features
 - REST API v3
 - Webhook support via plugins
 - More complex than needed
 
 ### Bugzilla
+
 - Legacy system, primarily for bug tracking
 - Limited modern API features
 - Not recommended for new projects
 
 ### Trac
+
 - Tightly integrated with SVN/Git
 - Limited API capabilities
 - Legacy architecture
@@ -93,6 +102,7 @@
 **Primary Choice: Plane**
 
 Reasons:
+
 1. **API-First Design**: Built for programmatic use from the ground up
 2. **Modern Architecture**: Clean codebase, easy to extend
 3. **Webhook Reliability**: Built-in retry logic for failed deliveries
@@ -103,6 +113,7 @@ Reasons:
 **Secondary Choice: GitLab CE (self-hosted)**
 
 If we need:
+
 - Tighter source control integration
 - Built-in CI/CD triggers
 - More mature ecosystem
@@ -110,8 +121,9 @@ If we need:
 ## Implementation Considerations
 
 ### Webhook Event Types (Plane)
+
 - `issue.created`
-- `issue.updated` 
+- `issue.updated`
 - `issue.deleted`
 - `issue.comment.created`
 - `issue.assignee.updated`
@@ -119,11 +131,13 @@ If we need:
 - `issue.state.updated`
 
 ### API Authentication
+
 - Generate API keys per agent
 - Implement rate limiting awareness
 - Use webhook signatures for security
 
 ### Agent Integration Pattern
+
 1. Each agent gets unique API credentials
 2. Webhook endpoint per agent type
 3. Event filtering based on agent role
