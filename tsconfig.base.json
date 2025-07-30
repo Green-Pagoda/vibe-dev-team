@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -14,15 +14,15 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowJs": false,
     "types": ["bun-types"],
+    "skipLibCheck": true, // Required due to broken dependency type definitions (Mastra @prisma-app/client, Next.js React types)
     "paths": {
       "@vibe-dev-team/agent-core": ["./packages/agent-core/src"],
-      "@vibe-dev-team/plane-client": ["./packages/plane-client/src"],
-      "@vibe-dev-team/shared-types": ["./packages/shared-types/src"]
+      "@vibe-dev-team/plane-mcp-client": ["./packages/plane-mcp-client/src"]
     }
-  }
+  },
+  "exclude": ["node_modules/@mastra/core/dist/prisma/client.ts", "node_modules"]
 }

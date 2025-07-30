@@ -14,7 +14,6 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowJs": false,
@@ -25,8 +24,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@vibe-dev-team/agent-core": ["../../packages/agent-core/src"],
-      "@vibe-dev-team/plane-client": ["../../packages/plane-client/src"],
-      "@vibe-dev-team/shared-types": ["../../packages/shared-types/src"]
+      "@vibe-dev-team/plane-mcp-client": ["../../packages/plane-mcp-client/src"]
     }
   },
   "include": ["src/**/*"],

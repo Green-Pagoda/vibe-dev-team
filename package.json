@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "docker-compose up",
     "build": "docker-compose build",
-    "typecheck": "npx tsc --noEmit",
+    "typecheck": "npx tsc --noEmit --project tsconfig.base.json",
+    "typecheck:strict": "npx tsc --noEmit --skipLibCheck false --project tsconfig.base.json",
     "lint": "npx eslint . --ext .ts,.tsx",
     "lint:fix": "npx eslint . --ext .ts,.tsx --fix",
     "format": "npx prettier --write '**/*.{ts,tsx,json,md}'",

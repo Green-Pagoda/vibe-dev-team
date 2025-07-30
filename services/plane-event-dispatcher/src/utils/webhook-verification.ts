@@ -8,7 +8,7 @@ export async function verifyPlaneWebhook(
   payload: string,
   signature: string
 ): Promise<boolean> {
-  const webhookSecret = process.env.PLANE_WEBHOOK_SECRET;
+  const webhookSecret = process.env['PLANE_WEBHOOK_SECRET'];
 
   if (!webhookSecret) {
     console.error('PLANE_WEBHOOK_SECRET not configured');

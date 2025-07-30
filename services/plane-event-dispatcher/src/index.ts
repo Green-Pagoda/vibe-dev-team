@@ -29,7 +29,7 @@ app.notFound((c) => {
   return c.json({ error: 'Not Found' }, 404);
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env['PORT'] || 3000;
 
 export default {
   port,

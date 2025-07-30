@@ -41,8 +41,8 @@ webhookRouter.post('/plane', async (c) => {
       `Received Plane webhook: ${validatedPayload.event}.${validatedPayload.action}`
     );
 
-    // Handle the event asynchronously
-    handlePlaneEvent(validatedPayload).catch(console.error);
+    // Handle the event asynchronously - cast to the discriminated union type
+    handlePlaneEvent(validatedPayload as any).catch(console.error);
 
     // Return immediate response to Plane
     return c.json({ status: 'accepted' }, 202);

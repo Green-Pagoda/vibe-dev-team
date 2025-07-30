@@ -7,7 +7,7 @@ healthRouter.get('/', (c) => {
     status: 'healthy',
     service: 'plane-event-dispatcher',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '0.1.0',
+    version: process.env['npm_package_version'] || '0.1.0',
   });
 });
 

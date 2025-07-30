@@ -80,10 +80,10 @@ export class PlaneMCPClient {
     this.config = config;
 
     // Set environment variables for the MCP server
-    process.env.PLANE_API_KEY = config.apiKey;
-    process.env.PLANE_WORKSPACE_SLUG = config.workspaceSlug;
+    process.env['PLANE_API_KEY'] = config.apiKey;
+    process.env['PLANE_WORKSPACE_SLUG'] = config.workspaceSlug;
     if (config.apiHostUrl) {
-      process.env.PLANE_API_HOST_URL = config.apiHostUrl;
+      process.env['PLANE_API_HOST_URL'] = config.apiHostUrl;
     }
   }
 
@@ -152,7 +152,7 @@ export class PlaneMCPClient {
    * Add a comment to an issue
    */
   async addComment(
-    projectId: string,
+    _projectId: string,
     issueId: string,
     comment: string
   ): Promise<PlaneComment> {

@@ -91,3 +91,59 @@ All architecture and design documentation has been created:
 ## Repository Conventions
 
 - Changes to the planning docs under folder planning/ should be considered enhancements not docs changes, as the docs themselves are the artifact of that component.
+
+## Standard Operating Procedures
+
+### Package Management Protocol (CRITICAL)
+
+**MANDATORY**: After ANY changes to package.json, lockfiles, or npm dependencies:
+
+1. **Immediate Verification Required**:
+
+   ```bash
+   npm install          # Must succeed without errors
+   npm run typecheck    # Must pass with ZERO errors
+   npm run format       # Must complete successfully
+   npm run lint         # Must pass with current config
+   ```
+
+2. **Scope**: This applies to the ENTIRE repository, not just changed packages
+3. **Failure Protocol**: If any command fails, the change MUST be fixed before proceeding
+4. **No Exceptions**: This check is required even for "small" changes to dependencies
+
+**Rationale**: The workspace resolved its issues through careful dependency management. Breaking this requires immediate detection and resolution to maintain developer experience.
+
+### Error Handling Protocol (FUNDAMENTAL)
+
+**NEVER EVER just silently SKIP or HIDE ERRORS. When there is an error, WE MUST FIX IT.**
+
+**FORBIDDEN Practices**:
+
+- `--skipLibCheck` for hiding OUR code errors
+- `--no-emit-on-error` with ignore flags
+- `// @ts-ignore` without fixing the underlying issue
+- ESLint disable comments without addressing the problem
+- Any flag or configuration that suppresses errors instead of resolving them
+
+**EXCEPTION for `--skipLibCheck`**:
+
+- **Permitted ONLY** when dependencies have broken type definitions
+- **Must be documented** with specific reasons (broken deps listed)
+- **Our code must still have zero errors** when lib checking is disabled
+- **Temporary measure** until dependencies are fixed or replaced
+
+**Required Approach**:
+
+- **Fix the root cause** of every error
+- **Understand why** the error occurred
+- **Address the underlying problem**, don't mask symptoms
+- **Zero tolerance** for "expected errors" - all errors must be resolved
+
+**Rationale**: Hiding errors leads to technical debt, runtime failures, and poor code quality. Every error represents a real problem that needs solving.
+
+### Development Environment Standards
+
+- **Local Development**: Must work with `npm install` (no Docker requirement)
+- **Docker Development**: Must remain functional as alternative option
+- **Workspace Integrity**: All internal package references must resolve correctly
+- **Tool Compatibility**: ESLint, Prettier, TypeScript must all function properly

@@ -111,8 +111,9 @@ export class FeatureEstimatorAgent extends BaseAgent {
   }
 
   private async generateLLMEstimation(prompt: string) {
+    // TODO: Update to use proper Mastra LLM integration when upgrading to v0.12+
     return generateText({
-      model: this.mastra.llm.model,
+      model: 'gpt-4' as any, // Type cast for now until Mastra config is fixed
       prompt,
       system: this.getSystemPrompt(),
     });

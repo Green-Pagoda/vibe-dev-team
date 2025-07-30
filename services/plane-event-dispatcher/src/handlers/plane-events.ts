@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import type { PlaneIssue, PlaneComment } from '@vibe-dev-team/plane-mcp-client';
 
 // Base webhook payload
@@ -35,14 +34,21 @@ const eventHandlers: Record<
 };
 
 export class WebhookHandlerError extends Error {
+  public override name = 'WebhookHandlerError';
+  public eventKey: string;
+  public webhookId: string;
+  public override cause?: Error;
+
   constructor(
     message: string,
-    public eventKey: string,
-    public webhookId: string,
-    public cause?: Error
+    eventKey: string,
+    webhookId: string,
+    cause?: Error
   ) {
     super(message);
-    this.name = 'WebhookHandlerError';
+    this.eventKey = eventKey;
+    this.webhookId = webhookId;
+    this.cause = cause;
   }
 }
 
