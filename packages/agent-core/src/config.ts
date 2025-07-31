@@ -113,13 +113,19 @@ export class ConfigLoader<T extends BaseConfig = BaseConfig> {
     return result.data;
   }
 
-  private deepMerge(target: any, source: any): any {
+  private deepMerge(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>
+  ): Record<string, unknown> {
     const result = { ...target };
 
     for (const key in source) {
       if (source[key] !== undefined && source[key] !== null) {
         if (typeof source[key] === 'object' && !Array.isArray(source[key])) {
-          result[key] = this.deepMerge(result[key] || {}, source[key]);
+          result[key] = this.deepMerge(
+            (result[key] as Record<string, unknown>) || {},
+            source[key] as Record<string, unknown>
+          );
         } else {
           result[key] = source[key];
         }

@@ -2,15 +2,18 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { HTTPException } from 'hono/http-exception';
 import { verifyPlaneWebhook } from '../utils/webhook-verification';
-import { handlePlaneEvent } from '../handlers/plane-events';
+import {
+  handlePlaneEvent,
+  type PlaneWebhookPayload,
+} from '../handlers/plane-events';
 
 const webhookRouter = new Hono();
 
-// Plane webhook payload schema
+// Plane webhook payload schema - validates structure but not full typing
 const PlaneWebhookSchema = z.object({
-  event: z.string(),
-  action: z.string(),
-  data: z.record(z.any()),
+  event: z.enum(['issue', 'issue_comment']),
+  action: z.enum(['created', 'updated', 'deleted']),
+  data: z.object({}).passthrough(), // Allow any object shape
   webhook_id: z.string(),
   workspace_id: z.string(),
   project_id: z.string().optional(),
@@ -41,8 +44,10 @@ webhookRouter.post('/plane', async (c) => {
       `Received Plane webhook: ${validatedPayload.event}.${validatedPayload.action}`
     );
 
-    // Handle the event asynchronously - cast to the discriminated union type
-    handlePlaneEvent(validatedPayload as any).catch(console.error);
+    // Handle the event asynchronously - cast through unknown for type safety
+    handlePlaneEvent(validatedPayload as unknown as PlaneWebhookPayload).catch(
+      console.error
+    );
 
     // Return immediate response to Plane
     return c.json({ status: 'accepted' }, 202);
